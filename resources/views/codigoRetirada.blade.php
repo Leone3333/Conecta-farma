@@ -462,6 +462,10 @@
                     <input type="text" class="form-input" id="medicationInput" placeholder="Ex: Dipirona" required>
                 </div>
                 <div class="form-group">
+                    <label class="form-label">Lote</label>
+                    <input type="text" class="form-input" id="medicationInput" placeholder="L45AB" required>
+                </div>
+                <div class="form-group">
                     <label class="form-label">Quantidade</label>
                     <input type="number" class="form-input" id="quantityInput" min="1" placeholder="1" required>
                 </div>
