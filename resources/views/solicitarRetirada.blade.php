@@ -163,7 +163,7 @@
         .suggestion-item {
             padding: 12px 20px;
             cursor: pointer;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #eeeeeeff;
         }
 
         .suggestion-item:hover {
