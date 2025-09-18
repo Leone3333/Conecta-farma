@@ -197,7 +197,9 @@
     <div class="login-container">
         <h1 class="login-title">Login</h1>
         
-        <form id="loginForm">
+        <!-- id="loginForm"> -->
+        <form action="/login" method="post" >
+             @csrf
             <div class="form-group">
                 <label for="matricula" class="form-label">Matrícula</label>
                 <input 
