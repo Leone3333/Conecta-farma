@@ -38,7 +38,7 @@
         }
 
         .login-container {
-            background: #1db584;
+            background: #1690cf;
             border-radius: 20px;
             padding: 40px;
             width: 100%;
