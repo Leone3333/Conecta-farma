@@ -9,6 +9,7 @@ Site de consulta de disponibilidade de medicamentos nos postos de saúde na cida
 Para executar na sua maquina baixe 
 
 -- Xamp (pacote com php, servidor apache e banco mySql)
+
 -- Composer
 
 ## Executar projeto local
@@ -52,7 +53,9 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Vá no navegador e digite [localphpMyAdmin](http://localhost/phpmyadmin/) 
+Vá no navegador e digite http://localhost/phpmyadmin/
+ou clique [localphpMyAdmin](http://localhost/phpmyadmin/) 
+
 Crie um banco de dados e anote o nome no campo orientado acima
 
 ### No projeto digite o comando da chave de segurança
@@ -64,7 +67,7 @@ php artisan key:generate
 php artisan migrate:fresh --seed
 ```
 
-### Executar o programa no navegador
-````bash
+### Executar o programa
+```bash
 php artisan serve
 ```
