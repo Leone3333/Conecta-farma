@@ -116,7 +116,7 @@
             border: none;
             border-radius: 12px;
             color: white;
-            background-color: #27F5EB;
+            background: linear-gradient(135deg, #3498db, #2980b9);
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
