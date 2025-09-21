@@ -19,6 +19,8 @@ class EstoqueSeeder extends Seeder
             ['id_postoFK' => 2, 'id_medicamentoFK' => 3, 'data_entrada' => now(), 'lote' => 'L9012', 'qtt_entrada' => 40],
             ['id_postoFK' => 1, 'id_medicamentoFK' => 4, 'data_entrada' => now(), 'lote' => 'L3456', 'qtt_entrada' => 200],
             ['id_postoFK' => 2, 'id_medicamentoFK' => 5, 'data_entrada' => now(), 'lote' => 'L7890', 'qtt_entrada' => 25],
+            ['id_postoFK' => 3, 'id_medicamentoFK' => 2, 'data_entrada' => now(), 'lote' => 'L5666', 'qtt_entrada' => 40],
+            ['id_postoFK' => 3, 'id_medicamentoFK' => 1, 'data_entrada' => now(), 'lote' => 'L0988', 'qtt_entrada' => 15],
         ]);
     }
 }

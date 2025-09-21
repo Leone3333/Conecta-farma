@@ -38,11 +38,11 @@ class SolicitarRetiController extends Controller
         if(count(array_intersect($medIdsSolicitados, $idsMposto)) === count($medIdsSolicitados)){
             // Posto com estoque
             $idPostoCestoque[] = $postoId; 
-            dd($idPostoCestoque);
-        }else{
+          }else{
             echo($errorM);
+          }
         }
-      }
+        // dd($idPostoCestoque);
 
 
 
