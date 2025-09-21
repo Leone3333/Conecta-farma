@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -287,18 +286,17 @@
 
             <div class="search-container">
                 <input type="text" class="search-input" placeholder="Ex: Dipirona" id="medicationInput">
-                <button class="search-btn" onclick="addMedication()">Adicionar</button>
 
                 <div class="suggestions" id="suggestions" style="display: none;">
+                    
                     @foreach($medicamentos as $medicamento)
-                        <div class="suggestion-item" onclick="selectSuggestion('{{ $medicamento['nome'] }}')">
+                     
+                        <div class="suggestion-item" data-id='{{ $medicamento['id_medicamento'] }}'
+                            data-nome='{{ $medicamento['nome'] }}' onclick="selectSuggestion(this)">
                             {{$medicamento['nome']}}
                         </div>
                     @endforeach
-                    <!-- <div class="suggestion-item" onclick="selectSuggestion('Dipirona 1g')">Dipirona 1g</div>
-                    <div class="suggestion-item" onclick="selectSuggestion('Buscopan')">Buscopan</div>
-                    <div class="suggestion-item" onclick="selectSuggestion('Nimesulida')">Nimesulida</div>
-                    <div class="suggestion-item" onclick="selectSuggestion('Amitriptilina')">Amitriptilina</div> -->
+        
                 </div>
             </div>
         </div>
@@ -310,9 +308,9 @@
             <p class="pickup-subtitle">Atenção coloque apenas a quantidade<br>que consta na receita</p>
 
             <form action="/solicitar" method="post">
-            @csrf
+                @csrf
                 <div id="medicationList">
-                    
+
                 </div>
                 <button class="search-final-btn">Buscar</button>
             </form>
@@ -320,146 +318,149 @@
     </div>
 
     <script>
-        let medications = [];
+    let medications = [];
 
-        const medicationInput = document.getElementById('medicationInput');
-        const suggestions = document.getElementById('suggestions');
+    const medicationInput = document.getElementById('medicationInput');
+    const suggestions = document.getElementById('suggestions');
+    const medicationList = document.getElementById('medicationList');
 
-        // Adiciona um evento de input para filtrar as sugestões em tempo real
-        medicationInput.addEventListener('input', function () {
-            const searchTerm = this.value.toLowerCase();
+    // Adiciona um evento de input para filtrar as sugestões em tempo real
+    medicationInput.addEventListener('input', function () {
+        const searchTerm = this.value.toLowerCase();
+        const suggestionItems = suggestions.querySelectorAll('.suggestion-item');
+        let hasMatch = false;
 
-            // Filtra os itens de sugestão para mostrar apenas os que correspondem
-            const suggestionItems = suggestions.querySelectorAll('.suggestion-item');
-            let hasMatch = false;
-
-            suggestionItems.forEach(item => {
-                const medicationName = item.textContent.toLowerCase();
-                if (medicationName.includes(searchTerm)) {
-                    item.style.display = 'block'; // Exibe o item
-                    hasMatch = true;
-                } else {
-                    item.style.display = 'none'; // Esconde o item
-                }
-            });
-
-            // Exibe ou esconde a caixa de sugestões com base na entrada e nos resultados
-            if (searchTerm.length > 0 && hasMatch) {
-                suggestions.style.display = 'block';
+        suggestionItems.forEach(item => {
+            const medicationName = item.textContent.toLowerCase();
+            if (medicationName.includes(searchTerm)) {
+                item.style.display = 'block';
+                hasMatch = true;
             } else {
-                suggestions.style.display = 'none';
+                item.style.display = 'none';
             }
         });
 
-        // NOVO: Adiciona um evento de foco para exibir todas as sugestões quando o usuário clica no campo
-        medicationInput.addEventListener('focus', function () {
-            const suggestionItems = suggestions.querySelectorAll('.suggestion-item');
-            suggestionItems.forEach(item => {
-                item.style.display = 'block'; // Exibe todos os itens
-            });
-            suggestions.style.display = 'block'; // Exibe a caixa de sugestões
-        });
-
-        medicationInput.addEventListener('blur', function () {
-            setTimeout(() => {
-                suggestions.style.display = 'none';
-            }, 200);
-        });
-
-        function selectSuggestion(medication) {
-            medicationInput.value = medication;
+        if (searchTerm.length > 0 && hasMatch) {
+            suggestions.style.display = 'block';
+        } else {
             suggestions.style.display = 'none';
         }
+    });
 
-        function addMedication() {
+    // Adiciona um evento de foco para exibir todas as sugestões quando o usuário clica no campo
+    medicationInput.addEventListener('focus', function () {
+        const suggestionItems = suggestions.querySelectorAll('.suggestion-item');
+        suggestionItems.forEach(item => {
+            item.style.display = 'block';
+        });
+        suggestions.style.display = 'block';
+    });
+
+    medicationInput.addEventListener('blur', function () {
+        setTimeout(() => {
+            suggestions.style.display = 'none';
+        }, 200);
+    });
+
+    // Permite a tecla Enter para adicionar o medicamento
+    medicationInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
             const medicationName = medicationInput.value.trim();
             if (medicationName) {
-                // Verifica se o medicamento já existe
-                const existingIndex = medications.findIndex(med => med.name.toLowerCase() === medicationName.toLowerCase());
-
-                if (existingIndex >= 0) {
-                    medications[existingIndex].quantity += 1;
-                } else {
-                    medications.push({ name: medicationName, quantity: 1 });
-                }
-
-                renderMedicationList();
-                medicationInput.value = '';
+                addMedication({ name: medicationName });
             }
         }
-
-        function changeQuantity(index, change) {
-            medications[index].quantity = Math.max(0, medications[index].quantity + change);
-            if (medications[index].quantity === 0) {
-                medications.splice(index, 1);
-            }
-            renderMedicationList();
-        }
-
-        function renderMedicationList() {
-            const medicationList = document.getElementById('medicationList');
-            medicationList.innerHTML = medications.map((med, index) => `
-        <div class="medication-item">
-            <div class="quantity-controls">
-                <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">-</button>
-                <span class="quantity">${med.quantity}</span>
-                <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
-            </div>
-            <div class="medication-name">${med.name}</div>
-        </div>
-    `).join('');
-        }
-
-        // Permite a tecla Enter para adicionar o medicamento
-        medicationInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                addMedication();
-            }
-        });
-
-        function renderMedicationList() {
-    const medicationList = document.getElementById('medicationList');
-    
-    // Limpa a lista antes de renderizar para evitar duplicações
-    medicationList.innerHTML = '';
-
-    medications.forEach((med, index) => {
-        // Cria a div de exibição do medicamento
-        const medicationItem = document.createElement('div');
-        medicationItem.className = 'medication-item';
-
-        // Cria e adiciona a div com os controles de quantidade
-        medicationItem.innerHTML = `
-            <div class="quantity-controls">
-                <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">-</button>
-                <span class="quantity">${med.quantity}</span>
-                <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
-            </div>
-            <div class="medication-name">${med.name}</div>
-        `;
-        
-        // --- AQUI ESTÁ A PARTE IMPORTANTE! ---
-        // Cria um campo oculto para o nome do medicamento
-        const nameInput = document.createElement('input');
-        nameInput.type = 'hidden';
-        nameInput.name = `medicamentos[${index}][nome]`;
-        nameInput.value = med.name;
-
-        // Cria um campo oculto para a quantidade do medicamento
-        const quantityInput = document.createElement('input');
-        quantityInput.type = 'hidden';
-        quantityInput.name = `medicamentos[${index}][quantidade]`;
-        quantityInput.value = med.quantity;
-        
-        // Adiciona os campos ocultos à div do medicamento
-        medicationItem.appendChild(nameInput);
-        medicationItem.appendChild(quantityInput);
-
-        // Adiciona o item à lista principal
-        medicationList.appendChild(medicationItem);
     });
-}
-    </script>
+
+    // Função chamada ao clicar em uma sugestão
+    function selectSuggestion(element) {
+        const medicationName = element.getAttribute('data-nome');
+        const medicationId = element.getAttribute('data-id');
+        
+        // Passa o ID e o nome para a função de adicionar
+        addMedication({ name: medicationName, id: medicationId });
+        suggestions.style.display = 'none';
+        medicationInput.value = '';
+    }
+
+    // Função principal para adicionar um medicamento à lista
+    function addMedication(medication) {
+        let existingMedication;
+
+        // Verifica se o medicamento já existe (por ID ou nome)
+        if (medication.id) {
+            existingMedication = medications.find(med => med.id === medication.id);
+        } else {
+            existingMedication = medications.find(med => med.name.toLowerCase() === medication.name.toLowerCase());
+        }
+
+        if (existingMedication) {
+            existingMedication.quantity += 1;
+        } else {
+            // Se não tiver ID, adicione um novo objeto com quantidade
+            if (!medication.id) {
+                medications.push({ name: medication.name, quantity: 1 });
+            } else {
+                // Adiciona um novo objeto com ID e quantidade
+                medications.push({ name: medication.name, id: medication.id, quantity: 1 });
+            }
+        }
+        renderMedicationList();
+    }
+
+    // Função para alterar a quantidade de um item na lista
+    function changeQuantity(index, change) {
+        medications[index].quantity = Math.max(0, medications[index].quantity + change);
+        if (medications[index].quantity === 0) {
+            medications.splice(index, 1);
+        }
+        renderMedicationList();
+    }
+
+    // Função que renderiza a lista de medicamentos e cria os inputs ocultos
+    function renderMedicationList() {
+        // Limpa a lista antes de renderizar para evitar duplicações
+        medicationList.innerHTML = '';
+
+        medications.forEach((med, index) => {
+            const medicationItem = document.createElement('div');
+            medicationItem.className = 'medication-item';
+
+            medicationItem.innerHTML = `
+                <div class="quantity-controls">
+                    <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                    <span class="quantity">${med.quantity}</span>
+                    <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
+                </div>
+                <div class="medication-name">${med.name}</div>
+            `;
+            
+            // Cria e adiciona o campo oculto para o NOME
+            const nameInput = document.createElement('input');
+            nameInput.type = 'hidden';
+            nameInput.name = `medicamentos[${index}][nome]`;
+            nameInput.value = med.name;
+            medicationItem.appendChild(nameInput);
+
+            // Cria e adiciona o campo oculto para o ID, se existir
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = `medicamentos[${index}][id]`;
+                idInput.value = med.id;
+                medicationItem.appendChild(idInput);
+
+            // Cria e adiciona o campo oculto para a QUANTIDADE
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'hidden';
+            quantityInput.name = `medicamentos[${index}][quantidade]`;
+            quantityInput.value = med.quantity;
+            medicationItem.appendChild(quantityInput);
+
+            // Adiciona o item à lista principal
+            medicationList.appendChild(medicationItem);
+        });
+    }
+</script>
 </body>
 
 </html>
