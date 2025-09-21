@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -265,12 +266,8 @@
         }
     </style>
 </head>
-<body>
-    <div class="top-bar">
-        www.canva.com – Para sair do modo tela cheia, pressione
-        <button class="escape-btn">Esc</button>
-    </div>
 
+<body>
     <header class="header">
         <div class="logo-section">
             <div class="logo">⚕</div>
@@ -287,17 +284,21 @@
     <div class="main-container">
         <div class="search-section">
             <h2 class="search-title">Digite o nome do medicamento</h2>
-            
+
             <div class="search-container">
                 <input type="text" class="search-input" placeholder="Ex: Dipirona" id="medicationInput">
                 <button class="search-btn" onclick="addMedication()">Adicionar</button>
-                
+
                 <div class="suggestions" id="suggestions" style="display: none;">
-                    <div class="suggestion-item" onclick="selectSuggestion('Dipirona 500mg')">Dipirona 500mg</div>
-                    <div class="suggestion-item" onclick="selectSuggestion('Dipirona 1g')">Dipirona 1g</div>
+                    @foreach($medicamentos as $medicamento)
+                        <div class="suggestion-item" onclick="selectSuggestion('{{ $medicamento['nome'] }}')">
+                            {{$medicamento['nome']}}
+                        </div>
+                    @endforeach
+                    <!-- <div class="suggestion-item" onclick="selectSuggestion('Dipirona 1g')">Dipirona 1g</div>
                     <div class="suggestion-item" onclick="selectSuggestion('Buscopan')">Buscopan</div>
                     <div class="suggestion-item" onclick="selectSuggestion('Nimesulida')">Nimesulida</div>
-                    <div class="suggestion-item" onclick="selectSuggestion('Amitriptilina')">Amitriptilina</div>
+                    <div class="suggestion-item" onclick="selectSuggestion('Amitriptilina')">Amitriptilina</div> -->
                 </div>
             </div>
         </div>
@@ -307,49 +308,59 @@
         <div class="pickup-section">
             <h2 class="pickup-title">Medicamentos para retirada</h2>
             <p class="pickup-subtitle">Atenção coloque apenas a quantidade<br>que consta na receita</p>
-            
-            <div id="medicationList">
-                <div class="medication-item">
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="changeQuantity(0, -1)">-</button>
-                        <span class="quantity">1</span>
-                        <button class="quantity-btn" onclick="changeQuantity(0, 1)">+</button>
-                    </div>
-                    <div class="medication-name">Buscopan</div>
-                </div>
 
-                <div class="medication-item">
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="changeQuantity(1, -1)">-</button>
-                        <span class="quantity">3</span>
-                        <button class="quantity-btn" onclick="changeQuantity(1, 1)">+</button>
-                    </div>
-                    <div class="medication-name">Nimesulida</div>
+            <form action="/solicitar" method="post">
+            @csrf
+                <div id="medicationList">
+                    
                 </div>
-            </div>
-
-            <button class="search-final-btn">Buscar</button>
+                <button class="search-final-btn">Buscar</button>
+            </form>
         </div>
     </div>
 
     <script>
-        let medications = [
-            { name: 'Buscopan', quantity: 1 },
-            { name: 'Nimesulida', quantity: 3 }
-        ];
+        let medications = [];
 
         const medicationInput = document.getElementById('medicationInput');
         const suggestions = document.getElementById('suggestions');
 
-        medicationInput.addEventListener('input', function() {
-            if (this.value.length > 0) {
+        // Adiciona um evento de input para filtrar as sugestões em tempo real
+        medicationInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+
+            // Filtra os itens de sugestão para mostrar apenas os que correspondem
+            const suggestionItems = suggestions.querySelectorAll('.suggestion-item');
+            let hasMatch = false;
+
+            suggestionItems.forEach(item => {
+                const medicationName = item.textContent.toLowerCase();
+                if (medicationName.includes(searchTerm)) {
+                    item.style.display = 'block'; // Exibe o item
+                    hasMatch = true;
+                } else {
+                    item.style.display = 'none'; // Esconde o item
+                }
+            });
+
+            // Exibe ou esconde a caixa de sugestões com base na entrada e nos resultados
+            if (searchTerm.length > 0 && hasMatch) {
                 suggestions.style.display = 'block';
             } else {
                 suggestions.style.display = 'none';
             }
         });
 
-        medicationInput.addEventListener('blur', function() {
+        // NOVO: Adiciona um evento de foco para exibir todas as sugestões quando o usuário clica no campo
+        medicationInput.addEventListener('focus', function () {
+            const suggestionItems = suggestions.querySelectorAll('.suggestion-item');
+            suggestionItems.forEach(item => {
+                item.style.display = 'block'; // Exibe todos os itens
+            });
+            suggestions.style.display = 'block'; // Exibe a caixa de sugestões
+        });
+
+        medicationInput.addEventListener('blur', function () {
             setTimeout(() => {
                 suggestions.style.display = 'none';
             }, 200);
@@ -363,15 +374,15 @@
         function addMedication() {
             const medicationName = medicationInput.value.trim();
             if (medicationName) {
-                // Check if medication already exists
+                // Verifica se o medicamento já existe
                 const existingIndex = medications.findIndex(med => med.name.toLowerCase() === medicationName.toLowerCase());
-                
+
                 if (existingIndex >= 0) {
                     medications[existingIndex].quantity += 1;
                 } else {
                     medications.push({ name: medicationName, quantity: 1 });
                 }
-                
+
                 renderMedicationList();
                 medicationInput.value = '';
             }
@@ -388,23 +399,67 @@
         function renderMedicationList() {
             const medicationList = document.getElementById('medicationList');
             medicationList.innerHTML = medications.map((med, index) => `
-                <div class="medication-item">
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">-</button>
-                        <span class="quantity">${med.quantity}</span>
-                        <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
-                    </div>
-                    <div class="medication-name">${med.name}</div>
-                </div>
-            `).join('');
+        <div class="medication-item">
+            <div class="quantity-controls">
+                <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                <span class="quantity">${med.quantity}</span>
+                <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
+            </div>
+            <div class="medication-name">${med.name}</div>
+        </div>
+    `).join('');
         }
 
-        // Allow Enter key to add medication
-        medicationInput.addEventListener('keypress', function(e) {
+        // Permite a tecla Enter para adicionar o medicamento
+        medicationInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 addMedication();
             }
         });
+
+        function renderMedicationList() {
+    const medicationList = document.getElementById('medicationList');
+    
+    // Limpa a lista antes de renderizar para evitar duplicações
+    medicationList.innerHTML = '';
+
+    medications.forEach((med, index) => {
+        // Cria a div de exibição do medicamento
+        const medicationItem = document.createElement('div');
+        medicationItem.className = 'medication-item';
+
+        // Cria e adiciona a div com os controles de quantidade
+        medicationItem.innerHTML = `
+            <div class="quantity-controls">
+                <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                <span class="quantity">${med.quantity}</span>
+                <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
+            </div>
+            <div class="medication-name">${med.name}</div>
+        `;
+        
+        // --- AQUI ESTÁ A PARTE IMPORTANTE! ---
+        // Cria um campo oculto para o nome do medicamento
+        const nameInput = document.createElement('input');
+        nameInput.type = 'hidden';
+        nameInput.name = `medicamentos[${index}][nome]`;
+        nameInput.value = med.name;
+
+        // Cria um campo oculto para a quantidade do medicamento
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'hidden';
+        quantityInput.name = `medicamentos[${index}][quantidade]`;
+        quantityInput.value = med.quantity;
+        
+        // Adiciona os campos ocultos à div do medicamento
+        medicationItem.appendChild(nameInput);
+        medicationItem.appendChild(quantityInput);
+
+        // Adiciona o item à lista principal
+        medicationList.appendChild(medicationItem);
+    });
+}
     </script>
 </body>
+
 </html>
