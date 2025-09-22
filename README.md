@@ -8,9 +8,9 @@ Site de consulta de disponibilidade de medicamentos nos postos de saúde na cida
 
 Para executar na sua maquina baixe 
 
--- Xamp (pacote com php, servidor apache e banco mySql)
+-- [Xamp](https://www.apachefriends.org/pt_br/index.html) (pacote com php, servidor apache e banco mySql)
 
--- Composer
+-- [Composer](https://getcomposer.org/)
 
 ## Executar projeto local
 
