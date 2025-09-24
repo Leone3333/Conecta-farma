@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Estoque;
+use App\Models\Retiradas;
+use App\Models\Itens_retirados;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
@@ -42,9 +44,27 @@ class SolicitarRetiController extends Controller
             echo($errorM);
           }
         }
-        // dd($idPostoCestoque);
+        dd($this->buscaSaidas($idPostoCestoque,$medIdsSolicitados));
+        
+        
+        if(isset($idPostoCestoque) && $idPostoCestoque != []){
+          var_dump($listaMediFront);
+          dd($idPostoCestoque);
+        }else{
+          echo('Sem posto com medicamento solicitado: ');
+          var_dump($listaMediFront);
+        }
 
+        
+    }
 
-
+    public function buscaSaidas($id_postoFK,$mediSolicitados)
+    {
+      // ids dos postos das retiradas 
+      $retiradasPosto = Retiradas::where('id_postoFK', $id_postoFK)->pluck('id_postoFK');
+      
+      return Itens_retirados::whereIn('id_retiradaFK', $retiradasPosto)
+      ->whereIn('id_medicamentoFK', $mediSolicitados)
+      ->get();
     }
 }

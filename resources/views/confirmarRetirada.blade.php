@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +25,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .logo-section {
@@ -76,7 +77,7 @@
         .pharmacy-icon {
             width: 40px;
             height: 40px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -97,7 +98,7 @@
             background: white;
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border: 3px solid #3498db;
             flex: 1;
             max-width: 500px;
@@ -184,7 +185,7 @@
             background: white;
             border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
         }
 
         .info-title {
@@ -226,6 +227,13 @@
             display: none;
         }
 
+        .success-message > small{
+            font-size: 18px;
+        }
+        .success-message > strong{
+            font-size: 20px;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -234,7 +242,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             animation: fadeIn 0.3s ease;
         }
 
@@ -250,13 +258,25 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         @media (max-width: 768px) {
@@ -264,25 +284,27 @@
                 flex-direction: column;
                 padding: 20px 10px;
             }
-            
+
             .header {
                 flex-direction: column;
                 gap: 15px;
                 text-align: center;
             }
-            
+
             .buttons {
                 flex-direction: column;
             }
-            
+
             .btn {
                 width: 100%;
             }
         }
     </style>
 </head>
+
 <body>
     <header class="header">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <div class="logo-section">
             <div class="logo">⚕</div>
             <div class="city-info">
@@ -302,7 +324,8 @@
     <div class="container">
         <div class="main-card">
             <h2 class="ubs-title">UBS São Gonçalo</h2>
-            
+
+
             <div class="medications-section">
                 <h3>Medicamentos</h3>
                 <ul class="medication-list">
@@ -315,6 +338,7 @@
                 <button class="btn btn-cancel" onclick="cancelRequest()">Cancelar</button>
                 <button class="btn btn-request" onclick="requestMedication()">Solicitar retirada</button>
             </div>
+
 
             <div class="success-message" id="successMessage">
                 ✅ Solicitação enviada com sucesso! Você receberá uma confirmação em breve.
@@ -339,7 +363,8 @@
             <p style="margin-bottom: 20px; color: #7f8c8d;">Deseja realmente solicitar a retirada dos medicamentos?</p>
             <div style="display: flex; gap: 15px; justify-content: center;">
                 <button class="btn" style="background: #95a5a6; color: white;" onclick="closeModal()">Não</button>
-                <button class="btn" style="background: #27ae60; color: white;" onclick="confirmRequest()">Sim, solicitar</button>
+                <button class="btn" style="background: #27ae60; color: white;" onclick="confirmRequest()">Sim,
+                    solicitar</button>
             </div>
         </div>
     </div>
@@ -372,63 +397,94 @@
 
         function confirmRequest() {
             closeModal();
-            
-            // Simula o envio da solicitação
-            const buttons = document.querySelector('.buttons');
-            const successMessage = document.getElementById('successMessage');
-            
-            buttons.style.display = 'none';
-            successMessage.style.display = 'block';
-            
-            // Simula o processo de geração do código único
-            setTimeout(() => {
-                const codigo = 'SLV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-                successMessage.innerHTML = `
-                    ✅ Solicitação enviada com sucesso!<br>
-                    <strong>Código único: ${codigo}</strong><br>
-                    <small>Apresente este código na unidade de saúde junto com os documentos.</small>
-                `;
-            }, 1500);
+            console.log("teste");
+
+            // Suponha que você pegou os dados do formulário ou da lista de medicamentos
+            const requestData = {
+                id_funcionarioFK: 2,
+                id_postoFK: 2,
+                itens: [
+                    { id_medicamentoFK: 4, qtt_saida: 2, lote: 'L1234' },
+                    { id_medicamentoFK: 5, qtt_saida: 1, lote: 'L5678' },
+                ]
+            };
+
+            // Fazendo a requisição POST para o seu endpoint no Laravel
+            fetch('/api/ConfirmarRetirada', { // Mude '/api/confirmar' para a sua rota
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(requestData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Verifica se a operação foi um sucesso
+                    if (data.status === 'aprovado') {
+                        const buttons = document.querySelector('.buttons');
+                        const successMessage = document.getElementById('successMessage');
+
+                        buttons.style.display = 'none';
+                        successMessage.style.display = 'block';
+
+                        // Usa o código retornado pelo backend
+                        successMessage.innerHTML = `
+                ✅ Solicitação enviada com sucesso!<br><br>
+                <strong>Código único: ${data.codigo}</strong><br><br>
+                <small>Apresente este código na unidade de saúde junto com os documentos.</small><br><br>
+                <a href='/solicitar'><button class="btn btn-back">Sair</button></a>
+            `;
+                    } else {
+                        // Lógica para lidar com erros
+                        alert('Erro ao enviar solicitação: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Ocorreu um erro na requisição. Tente novamente.');
+                });
         }
 
         function confirmCancel() {
             closeModal();
-            
+
             // Simula o cancelamento
             alert('Solicitação cancelada com sucesso!');
-            
+
             // Reset da interface
             const buttons = document.querySelector('.buttons');
             const successMessage = document.getElementById('successMessage');
-            
+
             buttons.style.display = 'flex';
             successMessage.style.display = 'none';
         }
 
         // Fecha modal ao clicar fora dele
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const confirmModal = document.getElementById('confirmModal');
             const cancelModal = document.getElementById('cancelModal');
-            
+
             if (event.target == confirmModal || event.target == cancelModal) {
                 closeModal();
             }
         }
 
         // Adiciona efeitos de hover aos itens de medicamentos
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const medicationItems = document.querySelectorAll('.medication-item');
-            
+
             medicationItems.forEach(item => {
-                item.addEventListener('mouseenter', function() {
+                item.addEventListener('mouseenter', function () {
                     this.style.transform = 'translateX(5px)';
                 });
-                
-                item.addEventListener('mouseleave', function() {
+
+                item.addEventListener('mouseleave', function () {
                     this.style.transform = 'translateX(0)';
                 });
             });
         });
     </script>
 </body>
+
 </html>

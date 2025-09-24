@@ -3,6 +3,7 @@
 use App\Models\Medicamento;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AcessoController;
+use App\Http\Controllers\ConfirmarSoliController;
 use App\Http\Controllers\SolicitarRetiController;
 
 Route::get('/', function () {return view('welcome');});
@@ -15,7 +16,11 @@ Route::post('/solicitar',[SolicitarRetiController::class, 'buscaDisponibilidade'
 
 
 Route::get('/ProcurarUbs', function () {return view('ProcurarUbs');});
-Route::get('/ConfirmarRetirada', function () {return view('confirmarRetirada');});
+
+Route::get('/confirmar-retirada', function () {return view('confirmarRetirada');});
+
+// Se encontra em api.php
+// Route::post('/ConfirmarRetirada', [ConfirmarSoliController::class, 'confirmar']);
 
 
 // Módulo de funcionários
