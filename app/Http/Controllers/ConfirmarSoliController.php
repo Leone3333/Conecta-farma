@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Retiradas;
 use App\Models\Itens_retirados;
+use App\Models\Estoque;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str; 
@@ -16,10 +18,16 @@ class ConfirmarSoliController extends Controller
     public function confirmar(Request $request)
     {
 
-        // dd($request->all());
+        $idPosto = $request->idPosto;
+
+        $mediSolicitados = json_decode($request->solicitacao, true);
+
+        $loteRetirada = $this->estoqueRecente($idPosto, $mediSolicitados);
+
+        dd($loteRetirda);
+
          try {
         $validated = $request->validate([
-            'id_funcionarioFK' => 'required',
             'id_postoFK' => 'required|exists:postos_saude,id_posto',
             'itens' => 'required|array',
             'itens.*.id_medicamentoFK' => 'required|exists:medicamentos,id_medicamento',
@@ -42,7 +50,7 @@ class ConfirmarSoliController extends Controller
         // 1. Cria o registro de retirada no banco de dados.
        
         $novaRetirada = Retiradas::create([
-            'id_funcionarioFK' => $validated['id_funcionarioFK'],
+            'id_funcionarioFK' => 1,
             'id_postoFK' => $validated['id_postoFK'],
             'cod_saida' => $codUnico,
             'status' => 'Pendente',
@@ -70,5 +78,27 @@ class ConfirmarSoliController extends Controller
             'message' => 'Solicitação enviada com sucesso!',
             'codigo' => $codUnico,
         ]);
+    } 
+
+    public function estoqueRecente($idPostoSoli, $idMedicametnos)
+    {
+        $dataAntiga = Estoque::select(
+            DB::raw('MIN(data_entrada) as data_mais_antiga')
+
+        )
+        ->whereColumn('id_medicamentoFK', 'e.id_medicamentoFK')
+        ->where('id_postoFK', $idPostoSoli)
+        ->groupBy('id_medicamentoFK')
+        ->toSql();
+
+        $estoqueAntigo = Estoque::from('estoque as e')
+        ->select('e.lote', 'e.data_entrada')
+        ->where('id_postoFK', $idPostoSoli)
+        ->whereIn('id_medicamentoFK', $idMedicametnos)
+        ->whereRaw("e.data_entrada IN ({$dataAntiga})")
+        ->orderBy('e.data_entrada', 'asc')
+        ->get();
+
+         return $estoqueAntigo;
     }
 }

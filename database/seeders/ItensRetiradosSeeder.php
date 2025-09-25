@@ -14,16 +14,21 @@ class ItensRetiradosSeeder extends Seeder
     public function run(): void
     {
         DB::table('itens_retirados')->insert([
+            // Retirada 1 (Posto 1)
             ['id_retiradaFK' => 1, 'id_medicamentoFK' => 1, 'qtt_saida' => 10, 'lote' => 'L1234'],
-            ['id_retiradaFK' => 2, 'id_medicamentoFK' => 2, 'qtt_saida' => 5, 'lote' => 'L5678'],
-            ['id_retiradaFK' => 3, 'id_medicamentoFK' => 3, 'qtt_saida' => 15, 'lote' => 'L9012'],
-            ['id_retiradaFK' => 4, 'id_medicamentoFK' => 4, 'qtt_saida' => 3, 'lote' => 'L3456'],
-            ['id_retiradaFK' => 5, 'id_medicamentoFK' => 5, 'qtt_saida' => 8, 'lote' => 'L7890'],
-            ['id_retiradaFK' => 1, 'id_medicamentoFK' => 2, 'qtt_saida' => 7, 'lote' => 'L5678'],
-            ['id_retiradaFK' => 2, 'id_medicamentoFK' => 4, 'qtt_saida' => 12, 'lote' => 'L3456'],
-            ['id_retiradaFK' => 3, 'id_medicamentoFK' => 5, 'qtt_saida' => 4, 'lote' => 'L7890'],
-            ['id_retiradaFK' => 4, 'id_medicamentoFK' => 1, 'qtt_saida' => 9, 'lote' => 'L1234'],
-            ['id_retiradaFK' => 5, 'id_medicamentoFK' => 3, 'qtt_saida' => 11, 'lote' => 'L9012'],
+            ['id_retiradaFK' => 1, 'id_medicamentoFK' => 2, 'qtt_saida' => 5, 'lote' => 'L5666'],
+
+            // Retirada 2 (Posto 2)
+            ['id_retiradaFK' => 2, 'id_medicamentoFK' => 2, 'qtt_saida' => 15, 'lote' => 'L3456'],
+
+            // Retirada 3 (Posto 1)
+            ['id_retiradaFK' => 3, 'id_medicamentoFK' => 1, 'qtt_saida' => 20, 'lote' => 'L1234'],
+
+            // Retirada 4 (Posto 2)
+            ['id_retiradaFK' => 4, 'id_medicamentoFK' => 2, 'qtt_saida' => 10, 'lote' => 'L3456'],
+
+            // Retirada 5 (Posto 1)
+            ['id_retiradaFK' => 5, 'id_medicamentoFK' => 3, 'qtt_saida' => 5, 'lote' => 'L0988'],
         ]);
     }
 }

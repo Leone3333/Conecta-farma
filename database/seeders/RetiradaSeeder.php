@@ -14,11 +14,11 @@ class RetiradaSeeder extends Seeder
     public function run(): void
     {
         DB::table('retiradas')->insert([
-            ['id_funcionarioFK' => 1, 'id_postoFK' => 1, 'cod_saida' => '#AB123C', 'data_saida' => now(), 'status' => 'Pendente'],
-            ['id_funcionarioFK' => 2, 'id_postoFK' => 2, 'cod_saida' => '#GH456L', 'data_saida' => now(), 'status' => 'Pendente'],
-            ['id_funcionarioFK' => 1, 'id_postoFK' => 1, 'cod_saida' => '#PO789Q', 'data_saida' => now(), 'status' => 'Pendente'],
-            ['id_funcionarioFK' => 3, 'id_postoFK' => 2, 'cod_saida' => '#RS101T', 'data_saida' => now(), 'status' => 'Pendente'],
-            ['id_funcionarioFK' => 2, 'id_postoFK' => 1, 'cod_saida' => '#UV232W', 'data_saida' => now(), 'status' => 'Pendente'],
+            ['id_funcionarioFK' => 1, 'id_postoFK' => 1, 'cod_saida' => '#AB123C', 'data_saida' => now(), 'status' => 'Pendente'], // ID 1, Posto 1
+            ['id_funcionarioFK' => 1, 'id_postoFK' => 2, 'cod_saida' => '#GH456L', 'data_saida' => now(), 'status' => 'Pendente'], // ID 2, Posto 2
+            ['id_funcionarioFK' => 1, 'id_postoFK' => 1, 'cod_saida' => '#PO789Q', 'data_saida' => now(), 'status' => 'Pendente'], // ID 3, Posto 1
+            ['id_funcionarioFK' => 1, 'id_postoFK' => 2, 'cod_saida' => '#RS101T', 'data_saida' => now(), 'status' => 'Pendente'], // ID 4, Posto 2
+            ['id_funcionarioFK' => 1, 'id_postoFK' => 1, 'cod_saida' => '#UV232W', 'data_saida' => now(), 'status' => 'Pendente'], // ID 5, Posto 1
         ]);
     }
 }

@@ -402,10 +402,10 @@
             // Suponha que você pegou os dados do formulário ou da lista de medicamentos
             const requestData = {
                 id_funcionarioFK: 2,
-                id_postoFK: 2,
+                id_postoFK: 3,
                 itens: [
-                    { id_medicamentoFK: 4, qtt_saida: 2, lote: 'L1234' },
-                    { id_medicamentoFK: 5, qtt_saida: 1, lote: 'L5678' },
+                    { id_medicamentoFK: 8, qtt_saida: 2, lote: 'L1234' },
+                    { id_medicamentoFK: 9, qtt_saida: 1, lote: 'L5678' },
                 ]
             };
 

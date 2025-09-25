@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -149,7 +150,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .post-title {
@@ -170,6 +171,37 @@
             font-size: 13px;
             color: #333;
             font-weight: bold;
+        }
+
+        .btn-solicitar_retirar {
+            /* Aparência Básica */
+            display: block;
+            /* Garante que ocupe a largura total */
+            width: 100%;
+            padding: 10px;
+
+            /* Cores e Borda */
+            background-color: #17a2b8;
+            /* Cor que combina com a borda do card */
+            color: white;
+            border: none;
+            border-radius: 8px;
+
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+
+            /* Efeitos de Interação */
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 15px;
+            /* Adiciona um espaço acima do botão, separando-o do telefone */
+        }
+
+        /* Efeito de hover */
+        .btn-solicitar_retirar:hover {
+            background-color: #137989;
+            /* Um tom um pouco mais escuro ao passar o mouse */
         }
 
         @media (max-width: 768px) {
@@ -194,6 +226,7 @@
         }
     </style>
 </head>
+
 <body>
     <header class="header">
         <div class="logo-section">
@@ -211,117 +244,95 @@
 
     <main class="main-content">
         <h1 class="search-title">Digite UBS ou USF e o nome do posto</h1>
-        
+
         <div class="search-container">
             <input type="text" class="search-input" placeholder="Ex: UBS SAO GONCALO" id="searchInput">
-            <div class="search-icon" onclick="performSearch()">🔍</div>
         </div>
 
         <div class="results-container" id="resultsContainer">
-            <div class="health-post">
-                <div>
-                    <div class="post-title">Posto de saúde: UBS SAO GONCALO</div>
-                    <div class="post-address">Endereço: AVENIDA CARDEAL DA SILVA - 789, FEDERACAO</div>
-                </div>
-                <div class="post-phone">Telefone: (71)3611-1340</div>
+            @if ($postos_disponiveis->isEmpty())
+              
+            <div class="alert alert-warning" role="alert">
+                Nenhum posto encontrado que possua todos os medicamentos solicitados.
             </div>
+            @else
+               {{ dd($detalhes = collect($detalhes_disponibilidade)) }}
+                @foreach($postos_disponiveis as $posto)
+                    <form action='/api/ConfirmarRetirada' method="post">
+                        @csrf
 
-            <div class="health-post">
-                <div>
-                    <div class="post-title">Posto de saúde: USF PROF EDUARDO MAMEDE</div>
-                    <div class="post-address">Endereço: SETOR E CAMINHO 16 - S/N, MUSSURUNGA I</div>
-                </div>
-                <div class="post-phone">Telefone: (71) 36112962</div>
-            </div>
+                        <div class="health-post">
+                            <div class="post-title">Posto de saúde: {{$posto['nome']}}</div>
+                            <div class="post-address">Endereço: {{$posto['endereco']}}</div>
+                            <div class="post-phone">Telefone: {{$posto['telefone'] ?? 'Sem telefone'}}</div>
+                            <input type="hidden" name="idPosto" value="{{ json_encode($posto['id_posto']) }}">
 
-            <div class="health-post">
-                <div>
-                    <div class="post-title">Posto de saúde: USF BOA VISTA DE SAO CAETANO</div>
-                    <div class="post-address">Endereço: RUA RODOVIA A - S/N, BOA VISTA DE SAO CAE</div>
-                </div>
-                <div class="post-phone">Telefone: (71) 3611-3543</div>
-            </div>
+                            @php
+                                $solicitacaoJson = collect($solicitacao_retirada)
+                                    ->map(function ($item) {
+                                        return ['id' => $item['id'], 'quantidade' => $item['quantidade']];
+                                    })
+                                    ->values()
+                                    ->toJson();
+
+                              
+
+                            @endphp
+
+                            <input type="hidden" name="solicitacao" value="{{ $solicitacaoJson }}">
+                            <button class="btn btn-solicitar_retirar">Retirar</button>
+                        </div>
+                    </form>
+                @endforeach
+            @endif
         </div>
     </main>
 
     <script>
-        // Dados simulados dos postos de saúde
-        const healthPosts = [
-            {
-                name: "UBS SAO GONCALO",
-                address: "AVENIDA CARDEAL DA SILVA - 789, FEDERACAO",
-                phone: "(71)3611-1340"
-            },
-            {
-                name: "USF PROF EDUARDO MAMEDE", 
-                address: "SETOR E CAMINHO 16 - S/N, MUSSURUNGA I",
-                phone: "(71) 36112962"
-            },
-            {
-                name: "USF BOA VISTA DE SAO CAETANO",
-                address: "RUA RODOVIA A - S/N, BOA VISTA DE SAO CAE", 
-                phone: "(71) 3611-3543"
-            },
-            {
-                name: "UBS CENTRO HISTÓRICO",
-                address: "RUA DAS LARANJEIRAS - 123, PELOURINHO",
-                phone: "(71) 3611-2000"
-            },
-            {
-                name: "USF ITAPUA",
-                address: "AVENIDA DORIVAL CAYMMI - 456, ITAPUA",
-                phone: "(71) 3611-3000"
-            }
-        ];
 
-        function renderResults(posts) {
-            const container = document.getElementById('resultsContainer');
-            container.innerHTML = '';
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('resultsContainer');
 
-            posts.forEach(post => {
-                const postElement = document.createElement('div');
-                postElement.className = 'health-post';
-                postElement.innerHTML = `
-                    <div>
-                        <div class="post-title">Posto de saúde: ${post.name}</div>
-                        <div class="post-address">Endereço: ${post.address}</div>
-                    </div>
-                    <div class="post-phone">Telefone: ${post.phone}</div>
-                `;
-                container.appendChild(postElement);
+        // Coleção de todos os cards de postos (health-post)
+        const healthPostCards = resultsContainer.querySelectorAll('.health-post');
+
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+
+            healthPostCards.forEach(postCard => {
+                // Obtém o texto relevante para busca do card
+                // Você precisa adaptar as classes conforme seu Blade
+                const postName = postCard.querySelector('.post-title').textContent.toLowerCase();
+                const postAddress = postCard.querySelector('.post-address').textContent.toLowerCase();
+
+                // Verifica se o termo de busca está no nome OU no endereço
+                if (postName.includes(searchTerm) || postAddress.includes(searchTerm)) {
+                    postCard.style.display = 'block'; // Mostra o card
+                } else {
+                    postCard.style.display = 'none'; // Esconde o card
+                }
             });
         }
 
-        function performSearch() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-            
-            if (!searchTerm) {
-                renderResults(healthPosts.slice(0, 3)); // Mostra os primeiros 3 por padrão
-                return;
-            }
-
-            const filteredPosts = healthPosts.filter(post => 
-                post.name.toLowerCase().includes(searchTerm) ||
-                post.address.toLowerCase().includes(searchTerm)
-            );
-
-            renderResults(filteredPosts);
-        }
-
         // Busca ao pressionar Enter
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        searchInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 performSearch();
             }
         });
 
         // Busca em tempo real enquanto digita
-        document.getElementById('searchInput').addEventListener('input', function() {
+        searchInput.addEventListener('input', function () {
             performSearch();
         });
 
-        // Renderiza os resultados iniciais
-        renderResults(healthPosts.slice(0, 3));
+        // Opcional: Se o campo estiver vazio ao carregar, mostra todos os resultados
+        window.addEventListener('load', function () {
+            if (!searchInput.value.trim()) {
+                healthPostCards.forEach(card => card.style.display = 'block');
+            }
+        });
     </script>
 </body>
+
 </html>

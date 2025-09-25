@@ -306,7 +306,10 @@
         <div class="pickup-section">
             <h2 class="pickup-title">Medicamentos para retirada</h2>
             <p class="pickup-subtitle">Atenção coloque apenas a quantidade<br>que consta na receita</p>
-
+            
+            @if (session('error'))
+                <p class="pickup-subtitle"><br>{{session('error')}}</p>
+            @endif
             <form action="/solicitar" method="post">
                 @csrf
                 <div id="medicationList">
