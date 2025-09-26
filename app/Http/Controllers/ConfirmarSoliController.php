@@ -18,30 +18,10 @@ class ConfirmarSoliController extends Controller
     public function confirmar(Request $request)
     {
 
-        $idPosto = $request->idPosto;
-
-        $mediSolicitados = json_decode($request->solicitacao, true);
-
-        $loteRetirada = $this->estoqueRecente($idPosto, $mediSolicitados);
-
-        dd($loteRetirda);
-
-         try {
-        $validated = $request->validate([
-            'id_postoFK' => 'required|exists:postos_saude,id_posto',
-            'itens' => 'required|array',
-            'itens.*.id_medicamentoFK' => 'required|exists:medicamentos,id_medicamento',
-            'itens.*.qtt_saida' => 'required|integer|min:1',
-            'itens.*.lote' => 'required|string|max:10',
-        ]);
-    } catch (ValidationException $e) {
-        // Se a validação falhar, retorne os erros como JSON
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Erro de validação.',
-            'errors' => $e->errors()
-        ], 422); // O código 422 significa "Entidade Não Processável"
-    }
+        $solicitacaoRetirada =  $request->all();
+        // dd($solicitacaoRetirada);
+         
+       
         
         // Gera um código de saída único.
         $codUnico = '#' . strtoupper(Str::random(6));

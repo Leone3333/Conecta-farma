@@ -250,36 +250,53 @@
         </div>
 
         <div class="results-container" id="resultsContainer">
-            @if ($postos_disponiveis->isEmpty())
-              
-            <div class="alert alert-warning" role="alert">
-                Nenhum posto encontrado que possua todos os medicamentos solicitados.
-            </div>
+            @if ($postosLotesDisponiveis->isEmpty())
+
+                <div class="alert alert-warning" role="alert">
+                    Nenhum posto encontrado que possua todos os medicamentos solicitados.
+                </div>
             @else
-               {{ dd($detalhes = collect($detalhes_disponibilidade)) }}
-                @foreach($postos_disponiveis as $posto)
+                @foreach($postosLotesDisponiveis as $posto)
+
                     <form action='/api/ConfirmarRetirada' method="post">
                         @csrf
 
                         <div class="health-post">
+                            <!-- CARD COM INFORMAÇÕES DO POSTO -->
                             <div class="post-title">Posto de saúde: {{$posto['nome']}}</div>
                             <div class="post-address">Endereço: {{$posto['endereco']}}</div>
                             <div class="post-phone">Telefone: {{$posto['telefone'] ?? 'Sem telefone'}}</div>
-                            <input type="hidden" name="idPosto" value="{{ json_encode($posto['id_posto']) }}">
 
-                            @php
-                                $solicitacaoJson = collect($solicitacao_retirada)
-                                    ->map(function ($item) {
-                                        return ['id' => $item['id'], 'quantidade' => $item['quantidade']];
-                                    })
-                                    ->values()
-                                    ->toJson();
+                            <!-- DADOS PARA CONFIRMAR RETIRADA -->
+                            <!-- ID DO POSTO ESCOLHIDO -->
 
-                              
+                            <input type="hidden" name="idPosto" value="{{ $posto['idPostoFK'] }}">
 
-                            @endphp
+                            <!-- DADOS DO LOTE A SER RETIRADO E DA SOLICITAÇÃO-->
+                            @foreach($posto['loteRetirada'] as $index => $lote)
+                                @php
+                                    $idMedicamento = $lote['idMedicamento'];
 
-                            <input type="hidden" name="solicitacao" value="{{ $solicitacaoJson }}">
+                                @endphp
+
+                                {{-- id medicamento --}}
+                                <input type="hidden" name="lotes_retirada[{{ $idMedicamento  }}][{{ $index }}][idMedicamento]"
+                                    value="{{ $lote['idMedicamento'] }}">
+
+                                {{-- Número do Lote --}}
+                                <input type="hidden" name="lotes_retirada[{{ $idMedicamento  }}][{{ $index }}][lote]"
+                                    value="{{ $lote['lote'] }}">
+
+                                <!-- Quantidade a ser consumida neste lote específico -->
+                                <input type="hidden"
+                                    name="lotes_retirada[{{ $idMedicamento  }}][{{ $index }}][saldoUsadoParaRetirada]"
+                                    value="{{ $lote['saldoUsadoParaRetirada'] }}">
+
+                                <input type="hidden" name="lotes_retirada[{{ $idMedicamento  }}][{{ $index }}][data_entrada]"
+                                    value="{{ $lote['data_entrada'] }}">
+
+
+                            @endforeach
                             <button class="btn btn-solicitar_retirar">Retirar</button>
                         </div>
                     </form>
