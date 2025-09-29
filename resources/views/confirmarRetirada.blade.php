@@ -227,10 +227,11 @@
             display: none;
         }
 
-        .success-message > small{
+        .success-message>small {
             font-size: 18px;
         }
-        .success-message > strong{
+
+        .success-message>strong {
             font-size: 20px;
         }
 
@@ -323,14 +324,21 @@
 
     <div class="container">
         <div class="main-card">
-            <h2 class="ubs-title">UBS São Gonçalo</h2>
+            <h2 class="ubs-title">{{$nomePosto}}</h2>
 
+            <input type="hidden" id="posto-id" value="{{ $idPosto }}">
+            <input type="hidden" id="codigo" value="{{ $codigo }}">
+
+            <div id="lotes-data" data-lotes="{{ json_encode($lotes) }}"></div>
 
             <div class="medications-section">
                 <h3>Medicamentos</h3>
                 <ul class="medication-list">
-                    <li class="medication-item">Dipirona: 1</li>
-                    <li class="medication-item">Nimesulida: 3</li>
+                    @foreach ($lotes as $retirada)
+                        <li class="medication-item">{{$retirada['nomeMedicamento']}}:
+                            {{$retirada['saldoUsadoParaRetirada']}}
+                        </li>
+                    @endforeach
                 </ul>
             </div>
 
@@ -397,16 +405,30 @@
 
         function confirmRequest() {
             closeModal();
-            console.log("teste");
 
-            // Suponha que você pegou os dados do formulário ou da lista de medicamentos
+            // 1. Acessa os dados injetados pelo Blade
+            const postoIdElement = document.getElementById('posto-id');
+            const codigoIdElement = document.getElementById('codigo');
+            const lotesDataElement = document.getElementById('lotes-data');
+            // console.log(lotesDataElement);
+
+            // 2. Extrai o ID do Posto e do codigo da retirada converte a string JSON de Lotes de volta para Objeto JS
+            const idPosto = postoIdElement.value;
+            const codigo = codigoIdElement.value;
+
+            // JSON.parse() converte a string JSON em objeto/array JavaScript
+            const lotesRetirada = JSON.parse(lotesDataElement.dataset.lotes);
+            console.log(lotesRetirada);
+
+            // 3. Monta a estrutura de dados esperada pelo seu Controller
             const requestData = {
-                id_funcionarioFK: 2,
-                id_postoFK: 3,
-                itens: [
-                    { id_medicamentoFK: 8, qtt_saida: 2, lote: 'L1234' },
-                    { id_medicamentoFK: 9, qtt_saida: 1, lote: 'L5678' },
-                ]
+
+                idPosto: idPosto,
+                codigo: codigo,
+
+                // Passa a lista de lotes diretamente. 
+                // Lembre-se que esta estrutura deve bater com o que o Controller ConfirmarSoliController está processando.
+                lotes_retirada: lotesRetirada
             };
 
             // Fazendo a requisição POST para o seu endpoint no Laravel

@@ -258,7 +258,7 @@
             @else
                 @foreach($postosLotesDisponiveis as $posto)
 
-                    <form action='/api/ConfirmarRetirada' method="post">
+                    <form action='/postoEscolhido' method="post">
                         @csrf
 
                         <div class="health-post">

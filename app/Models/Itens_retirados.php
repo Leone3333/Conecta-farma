@@ -11,9 +11,12 @@ class Itens_retirados extends Model
     
     protected $table = 'itens_retirados';
 
+    public $timestamps = false;
+
+
      protected $fillable = [
-    'id_retiradasFK',
-    'id_medicamentosFK',
+    'id_retiradaFK',
+    'id_medicamentoFK',
     'qtt_saida',
     'lote',
 ];

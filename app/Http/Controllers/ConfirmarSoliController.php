@@ -7,78 +7,92 @@ namespace App\Http\Controllers;
 use App\Models\Retiradas;
 use App\Models\Itens_retirados;
 use App\Models\Estoque;
+use App\Models\Postos_saude;
+use App\Models\Medicamento;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Str; 
+use Illuminate\Support\Str;
 
 class ConfirmarSoliController extends Controller
 {
     //
     public function confirmar(Request $request)
     {
+        $idRetiradaPosto = $request->input('idPosto');
+        $codigoRetirada = $request->input('codigo');
+        $retiradaLotes = collect($request->input('lotes_retirada'));
+        // dd($retiradaLotes);
 
-        $solicitacaoRetirada =  $request->all();
-        // dd($solicitacaoRetirada);
-         
-       
-        
-        // Gera um código de saída único.
-        $codUnico = '#' . strtoupper(Str::random(6));
-        // dd($codUnico);  
 
-        // 1. Cria o registro de retirada no banco de dados.
-       
+        // 1. Cria o registro de retirada no banco de dados.   
         $novaRetirada = Retiradas::create([
             'id_funcionarioFK' => 1,
-            'id_postoFK' => $validated['id_postoFK'],
-            'cod_saida' => $codUnico,
+            'id_postoFK' => $idRetiradaPosto,
+            'cod_saida' => $codigoRetirada,
             'status' => 'Pendente',
             'data_saida' => now(),
         ]);
         // dd($novaRetirada);
 
-        // 2. Insere os itens da retirada.
-        $allItens = collect($validated['itens'])->map(function ($item) use ($novaRetirada) {
-            return [
+        // dd($novaRetirada->id_retirada);
+        foreach ($retiradaLotes as $dadosLote) {
+            // 2. Insere os itens da retirada.
+            $novoItem = Itens_retirados::create([
                 'id_retiradaFK' => $novaRetirada->id_retirada,
-                'id_medicamentoFK' => $item['id_medicamentoFK'],
-                'qtt_saida' => $item['qtt_saida'],
-                'lote' => $item['lote']
-            ];
-        })->all();
-
-        Itens_retirados::insert($allItens);
-        // dd($allItens);
-
+                'id_medicamentoFK' => $dadosLote['idMedicamento'],
+                'qtt_saida' => $dadosLote['saldoUsadoParaRetirada'],
+                'lote' => $dadosLote['lote'],
+            ]);
+            // dd($novoItem);
+        }
 
         // 3. Retorna o código único em formato JSON para o JavaScript.
         return response()->json([
             'status' => 'aprovado',
             'message' => 'Solicitação enviada com sucesso!',
+            'codigo' => $codigoRetirada,
+        ]);
+    }
+
+    public function solicitarRetirada(Request $request)
+    {
+        $retiradaPosto = $request->input('idPosto');
+        $nomePosto = Postos_saude::find($retiradaPosto)->nome;
+        $retiradaLotes = collect($request->input('lotes_retirada'))->flatten(1);
+
+        // Gera um código de saída único.
+        $codUnico = '#' . strtoupper(Str::random(6));
+        // dd($codUnico);  
+
+        // 2. Extrai os IDs únicos de medicamentos para buscar no banco (Otimização!)
+        $idsUnicos = $retiradaLotes->pluck('idMedicamento')->unique();
+
+        // 3. Busca todos os nomes de medicamentos de uma vez e cria um mapa [id => nome]
+        $medicamentosMap = Medicamento::whereIn('id_medicamento', $idsUnicos)
+            ->pluck('nome', 'id_medicamento'); // Pluck com 2 argumentos cria o array associativo
+
+        // 4. Usa o map() para adicionar o nome a cada item da coleção
+        $dataLotes = $retiradaLotes->map(function ($dadosLote) use ($medicamentosMap) {
+
+            $idMedicamento = $dadosLote['idMedicamento'];
+
+            // Adiciona o novo campo 'nome_medicamento'
+            // Usa o get() do Collection para buscar o nome ou retorna 'Desconhecido'
+            $dadosLote['nomeMedicamento'] = $medicamentosMap->get($idMedicamento, 'Desconhecido');
+
+            // Retorna o array modificado, que agora tem o nome
+            return $dadosLote;
+        });
+
+        // A partir daqui, você usa a coleção $lotesComNomes
+        // dd($lotesComNomes);
+
+        return view('confirmarRetirada', [
+            'idPosto' => $retiradaPosto,
+            'nomePosto' => $nomePosto,
+            'lotes' => $dataLotes,
             'codigo' => $codUnico,
         ]);
-    } 
-
-    public function estoqueRecente($idPostoSoli, $idMedicametnos)
-    {
-        $dataAntiga = Estoque::select(
-            DB::raw('MIN(data_entrada) as data_mais_antiga')
-
-        )
-        ->whereColumn('id_medicamentoFK', 'e.id_medicamentoFK')
-        ->where('id_postoFK', $idPostoSoli)
-        ->groupBy('id_medicamentoFK')
-        ->toSql();
-
-        $estoqueAntigo = Estoque::from('estoque as e')
-        ->select('e.lote', 'e.data_entrada')
-        ->where('id_postoFK', $idPostoSoli)
-        ->whereIn('id_medicamentoFK', $idMedicametnos)
-        ->whereRaw("e.data_entrada IN ({$dataAntiga})")
-        ->orderBy('e.data_entrada', 'asc')
-        ->get();
-
-         return $estoqueAntigo;
     }
 }

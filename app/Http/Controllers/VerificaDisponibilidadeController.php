@@ -131,6 +131,7 @@ class VerificaDisponibilidadeController extends Controller
                         // Registra o Lote para a retirada, usando APENAS a quantidade restante necessária
                         $lotesParaRetirada->push([
                             'idMedicamento' => $idMedicamento,
+                            'nomeMedicamento' => $idMedicamento,
                             'lote' => $lote['lote'],
                             // Registra o valor exato a ser consumido neste lote
                             'saldoUsadoParaRetirada' => $qtdRestante,
@@ -286,7 +287,7 @@ class VerificaDisponibilidadeController extends Controller
             ->where('retiradas.id_postoFK', $idPosto)
             ->where('itens_retirados.id_medicamentoFK', $idMedicamento)
             // CORREÇÃO DE SINTAXE: Onde 'Pendente' é uma string, use aspas.
-            ->where('retiradas.status', 'Pendente')
+            ->where('retiradas.status', 'Pendente' or 'Negada')
             ->groupBy('itens_retirados.lote');
 
         // 2. Consulta Principal: Subtração e Checagem (> 0)

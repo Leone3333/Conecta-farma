@@ -20,8 +20,9 @@ Route::get('/ProcurarUbs', function () {return view('ProcurarUbs');});
 
 Route::get('/confirmar-retirada', function () {return view('confirmarRetirada');});
 
+Route::post('/postoEscolhido', [ConfirmarSoliController::class, 'solicitarRetirada']);
 // Se encontra em api.php
-// Route::post('/ConfirmarRetirada', [ConfirmarSoliController::class, 'confirmar']);
+// Route::post('/ConfirmarRetirada', [ConfirmarSoliController::class, 'confirmar']);    
 
 
 // Módulo de funcionários
