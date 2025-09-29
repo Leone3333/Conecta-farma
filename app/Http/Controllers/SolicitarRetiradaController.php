@@ -22,22 +22,26 @@ class SolicitarRetiradaController extends Controller
     public function solicitar(Request $request)
     {
         try {
-
             // Lista dos medicamentos vindo do front
             $listaMediFront = $request->input('medicamentos');
             $medIdsSolicitados = collect($listaMediFront)->pluck('id')->toArray();
-
             // dd($listaMediFront);
         } catch (Exception $error) {
             \Log::error("Erro na busca de disponibilidade: " . $error->getMessage());
             return back()->with('error', "Falha no envio dos dados.");
-
         }
 
-        // array
         $ocorreciasEstoque = $this->disponibilidadeController->getOcorrenciaEstque($medIdsSolicitados);
 
-        $ocorreciasOrdenadas = $this->disponibilidadeController->ordenarLotesPorFIFO($ocorreciasEstoque);
+        // verifica a existencia de postos com registros na tabela estoque com todos os medicaementos solicitados
+        $ocorreciasEstoqueValidado = $this->errorBusca($ocorreciasEstoque);
+
+        // ** PONTO DE PARADA ** Se o resultado for um objeto de Redirect (o erro), PARE E RETORNE.
+        if ($ocorreciasEstoqueValidado instanceof \Illuminate\Http\RedirectResponse) {
+            return $ocorreciasEstoqueValidado;
+        }
+
+        $ocorreciasOrdenadas = $this->disponibilidadeController->ordenarLotesPorFIFO($ocorreciasEstoqueValidado);
         // dd($ocorreciasEstoque);
 
         $detalhesDisponibilidade = $this->disponibilidadeController->calcularDisponibilidadePorLote($ocorreciasOrdenadas, $listaMediFront);
@@ -60,11 +64,20 @@ class SolicitarRetiradaController extends Controller
     }
 
     // usar em collection
-    private function errorBusca($consulta)
+    public function errorBusca($consulta)
     {
-        if ($consulta->isEmpty()) {
+
+        $converterCollection = collect($consulta);
+
+        if ($converterCollection->isEmpty()) {
             return back()->with('error', "Nenhum posto tem ocorrências para todos os itens solicitados.");
         }
+
+        if ($converterCollection->get('indisponivel', false) === true) {
+            return back()->with('error', "Nenhum posto tem ocorrências para todos os itens solicitados.");
+        }
+
+        return $converterCollection;
     }
 
 

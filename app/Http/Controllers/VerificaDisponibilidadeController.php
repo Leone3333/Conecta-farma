@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 
 class VerificaDisponibilidadeController extends Controller
 {
-    private $errorM = "Nenhum posto Com disponibilidade";
+    private $errorM = true;
 
     public function solicitacaoIndisponivel()
     {
@@ -287,7 +287,7 @@ class VerificaDisponibilidadeController extends Controller
             ->where('retiradas.id_postoFK', $idPosto)
             ->where('itens_retirados.id_medicamentoFK', $idMedicamento)
             // CORREÇÃO DE SINTAXE: Onde 'Pendente' é uma string, use aspas.
-            ->where('retiradas.status', 'Pendente' or 'Negada')
+            ->where('retiradas.status', ['Pendente','Negada'])
             ->groupBy('itens_retirados.lote');
 
         // 2. Consulta Principal: Subtração e Checagem (> 0)
