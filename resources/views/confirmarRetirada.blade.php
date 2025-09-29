@@ -12,6 +12,11 @@
             box-sizing: border-box;
         }
 
+        a{
+            text-decoration: none;
+            color: #fff;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
@@ -156,8 +161,10 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            
         }
 
+        
         .btn-cancel {
             background: #e74c3c;
             color: white;
@@ -384,7 +391,7 @@
             <p style="margin-bottom: 20px; color: #7f8c8d;">Tem certeza que deseja cancelar esta solicitação?</p>
             <div style="display: flex; gap: 15px; justify-content: center;">
                 <button class="btn" style="background: #95a5a6; color: white;" onclick="closeModal()">Não</button>
-                <button class="btn btn-cancel" onclick="confirmCancel()">Sim, cancelar</button>
+                <button class="btn btn-cancel" onclick="confirmCancel()"><a href="/solicitar">Sim, cancelar</a></button>
             </div>
         </div>
     </div>
