@@ -7,4 +7,5 @@ use App\Http\Controllers\ConfirmarSoliController;
 use App\Http\Controllers\SolicitarRetiController;
 
 
-Route::post('/ConfirmarRetirada', [ConfirmarSoliController::class, 'confirmar']);
+Route::post('/ConfirmarRetirada', [ConfirmarSoliController::class, 'confirmar'])
+->name('api.confirmarRetirada');

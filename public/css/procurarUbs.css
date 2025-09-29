@@ -1,0 +1,140 @@
+.main-content {
+    padding: 40px 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.search-title {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: normal;
+}
+
+.search-container {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.search-input {
+    width: 400px;
+    max-width: 100%;
+    padding: 15px 50px 15px 20px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #1f5582;
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background: #666;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+}
+
+.results-container {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.health-post {
+    background: white;
+    border: 3px solid #17a2b8;
+    border-radius: 15px;
+    padding: 25px;
+    width: 280px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.post-address {
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.3;
+}
+
+.post-phone {
+    font-size: 13px;
+    color: #333;
+    font-weight: bold;
+}
+
+.btn-solicitar_retirar {
+    /* Aparência Básica */
+    display: block;
+    /* Garante que ocupe a largura total */
+    width: 100%;
+    padding: 10px;
+
+    /* Cores e Borda */
+    background-color: #17a2b8;
+    /* Cor que combina com a borda do card */
+    color: white;
+    border: none;
+    border-radius: 8px;
+
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+
+    /* Efeitos de Interação */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 15px;
+    /* Adiciona um espaço acima do botão, separando-o do telefone */
+}
+
+/* Efeito de hover */
+.btn-solicitar_retirar:hover {
+    background-color: #137989;
+    /* Um tom um pouco mais escuro ao passar o mouse */
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .results-container {
+        justify-content: center;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .health-post {
+        width: 100%;
+        max-width: 350px;
+    }
+}
