@@ -16,6 +16,7 @@
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,13 +56,20 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
             animation: shimmer 3s ease-in-out infinite;
         }
 
         @keyframes shimmer {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(180deg); }
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            50% {
+                transform: rotate(180deg);
+            }
         }
 
         .login-title {
@@ -131,7 +139,7 @@
         .login-button:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            
+
         }
 
         .login-button:active {
@@ -185,53 +193,45 @@
                 padding: 30px 20px;
                 margin: 10px;
             }
-            
+
             .login-title {
                 font-size: 2rem;
             }
         }
     </style>
 </head>
+
 <body>
-    
+
     <div class="login-container">
         <h1 class="login-title">Login</h1>
-        
+
         <!-- id="loginForm"> -->
-        <form action="/login" method="post" >
-             @csrf
+        <form action="/login" method="post">
+            @csrf
             <div class="form-group">
                 <label for="matricula" class="form-label">Matrícula</label>
-                <input 
-                    type="text" 
-                    id="matricula" 
-                    name="matricula" 
-                    class="form-input" 
-                    placeholder="Digite sua matrícula"
-                    required
-                >
+                <input type="text" id="matricula" name="matricula" class="form-input" placeholder="Digite sua matrícula"
+                    required>
             </div>
-            
+
             <div class="form-group">
                 <label for="senha" class="form-label">Senha</label>
-                <input 
-                    type="password" 
-                    id="senha" 
-                    name="senha" 
-                    class="form-input" 
-                    placeholder="Digite sua senha"
-                    required
-                >
+                <input type="password" id="senha" name="senha" class="form-input" placeholder="Digite sua senha"
+                    required>
             </div>
-            
+
             <button type="submit" class="login-button" id="loginBtn">
                 Entrar
             </button>
-            
-            <div class="forgot-password">
+
+            @if (session('erroLogin'))
+                <p class="pickup-subtitle"><br>{{session('erroLogin')}}</p>
+            @endif
+            <!-- <div class="forgot-password">
                 <a href="#" onclick="showForgotPassword()">Esqueci minha senha</a>
             </div>
-            
+             -->
             <div id="message" class="message"></div>
         </form>
     </div>
@@ -239,28 +239,28 @@
         // Função para simular login
         function handleLogin(event) {
             event.preventDefault();
-            
+
             const matricula = document.getElementById('matricula').value;
             const senha = document.getElementById('senha').value;
             const messageDiv = document.getElementById('message');
             const loginBtn = document.getElementById('loginBtn');
-            
+
             // Validação básica
             if (!matricula || !senha) {
                 showMessage('Por favor, preencha todos os campos!', 'error');
                 return;
             }
-            
+
             // Animação do botão durante o "carregamento"
             loginBtn.innerHTML = 'Entrando...';
             loginBtn.disabled = true;
-            
+
             // Simular uma requisição de login (substituir por sua lógica real)
             setTimeout(() => {
                 // Exemplo de validação simples (substituir por sua lógica)
                 if (matricula === 'admin' && senha === '123456') {
                     showMessage('Login realizado com sucesso! Redirecionando...', 'success');
-                    
+
                     // Redirecionar após 2 segundos (substituir pela sua lógica)
                     setTimeout(() => {
                         // window.location.href = '/dashboard'; // Uncomment para redirecionar
@@ -269,36 +269,36 @@
                 } else {
                     showMessage('Matrícula ou senha incorretos. Tente novamente.', 'error');
                 }
-                
+
                 // Restaurar botão
                 loginBtn.innerHTML = 'Entrar';
                 loginBtn.disabled = false;
             }, 1500);
         }
-        
+
         // Função para exibir mensagens
         function showMessage(text, type) {
             const messageDiv = document.getElementById('message');
             messageDiv.textContent = text;
             messageDiv.className = `message ${type}`;
             messageDiv.style.display = 'block';
-            
+
             // Ocultar mensagem após 5 segundos
             setTimeout(() => {
                 messageDiv.style.display = 'none';
             }, 5000);
         }
-        
+
         // Função para "esqueci minha senha"
         function showForgotPassword() {
             alert('Funcionalidade "Esqueci minha senha" seria implementada aqui.\n\nEntre em contato com o suporte ou administrador do sistema.');
         }
-        
+
         // Event listeners
         document.getElementById('loginForm').addEventListener('submit', handleLogin);
-        
+
         // Permitir login com Enter
-        document.addEventListener('keypress', function(event) {
+        document.addEventListener('keypress', function (event) {
             if (event.key === 'Enter') {
                 const form = document.getElementById('loginForm');
                 if (form.checkValidity()) {
@@ -306,25 +306,26 @@
                 }
             }
         });
-        
+
         // Efeito de foco nos inputs
         const inputs = document.querySelectorAll('.form-input');
         inputs.forEach(input => {
-            input.addEventListener('focus', function() {
+            input.addEventListener('focus', function () {
                 this.parentElement.style.transform = 'scale(1.02)';
             });
-            
-            input.addEventListener('blur', function() {
+
+            input.addEventListener('blur', function () {
                 this.parentElement.style.transform = 'scale(1)';
             });
         });
-        
+
         // Para demonstração: mostrar credenciais de teste
         console.log('=== CREDENCIAIS DE TESTE ===');
         console.log('Matrícula: admin');
         console.log('Senha: 123456');
         console.log('===========================');
     </script>
-    
+
 </body>
+
 </html>

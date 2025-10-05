@@ -14,13 +14,102 @@ class VerificaDisponibilidadeController extends Controller
 {
     private $errorM = true;
 
+    // ... (dentro da classe VerificaDisponibilidadeController)
     public function solicitacaoIndisponivel()
     {
         return ['indisponivel' => $this->errorM];
     }
 
-    // ... (dentro da classe VerificaDisponibilidadeController)
 
+    //verificar na tabela estoque as ocorrências dos postos com todos os medicamentos solicitados 
+    public function getOcorrenciaEstque(array $medIdsSolicitados)
+    {
+        $countMedicamentos = count($medIdsSolicitados);
+
+        // 1. Encontra os IDs dos postos que possuem TODOS os medicamentos (Filtro inicial)
+        $pComTodosMedicamentos = Estoque::select('id_postoFK')
+            ->whereIn('id_medicamentoFK', $medIdsSolicitados)
+            ->groupBy('id_postoFK')
+            // Condição HAVING: Posto é elegível se tiver registros para TODOS os medicamentos
+            ->havingRaw('COUNT(DISTINCT id_medicamentoFK) = ?', [$countMedicamentos])
+            ->pluck('id_postoFK')
+            ->toArray();
+        if (empty($pComTodosMedicamentos)) {
+            return $this->solicitacaoIndisponivel();
+        } else {
+
+            // 2. Busca os registros de ESTOQUE brutos para os postos e medicamentos aptos
+            $estoquesAptos = Estoque::select(
+                'id_postoFK',
+                'id_medicamentoFK',
+                'qtt_entrada',
+                'lote',
+                'data_entrada'
+            )
+                ->whereIn('id_postoFK', $pComTodosMedicamentos)
+                ->whereIn('id_medicamentoFK', $medIdsSolicitados)
+                ->get();
+
+
+            // 3. Estrutura a coleção para o formato desejado (agrupado por Posto)
+            $estoqueAgrupado = $estoquesAptos->groupBy('id_postoFK')->map(function ($itensPorPosto, $idPosto) {
+
+                // Agrupa os itens por id_medicamentoFK dentro do posto
+                $detalhesPorMedicamento = $itensPorPosto->groupBy('id_medicamentoFK')->map(function ($lotesPorMedicamento, $idMedicamento) {
+
+                    // Mapeia para uma coleção simples dos lotes (como no seu exemplo)
+                    return $lotesPorMedicamento->map(function ($lote) {
+                        return [
+                            'idMedicamento' => $lote->id_medicamentoFK, // Usando 'id' como chave para o medicamento
+                            'qtt_entrada' => $lote->qtt_entrada,
+                            'lote' => $lote->lote,
+                            'data_entrada' => $lote->data_entrada,
+                        ];
+                    })->values()->toArray(); // Retorna um array simples de lotes para o medicamento
+                });
+
+                return [
+                    'id_postoFK' => $idPosto,
+                    'medicamentosConstam' => $detalhesPorMedicamento->toArray()
+                ];
+            })->values(); // Converte o mapa de volta para uma coleção sequencial
+
+            // dd($estoqueAgrupado);
+            return $estoqueAgrupado;
+
+        }
+
+    }
+    
+     /**
+     * Itera sobre a coleção de ocorrências com estoque e ordena os lotes
+     * de cada medicamento dentro de cada posto pela data de entrada (FIFO).
+     *
+     * @param Collection $ocorrenciasBrutas Coleção retornada de getOcorrenciaEstque.
+     * @return Collection Coleção com a mesma estrutura, mas lotes ordenados.
+     */
+    public function ordenarLotesPorFIFO(Collection $ocorrenciasBrutas): Collection
+    {
+        // iterar sobre cada Posto na coleção
+        return $ocorrenciasBrutas->map(function ($postoDetalhe) {
+
+            $medicamentosConstam = collect($postoDetalhe['medicamentosConstam'])->map(function ($lotesDoMedicamento) {
+
+                // Transforma o array de lotes em uma Coleção do Laravel para usar o sortBy
+                $lotesCollection = collect($lotesDoMedicamento);
+
+                // Aplica a ordenação: do mais antigo (ASC) ao mais recente pela 'data_entrada'
+                $lotesOrdenados = $lotesCollection->sortBy('data_entrada')->values()->toArray();
+
+                return $lotesOrdenados;
+            });
+
+            // Retorna o objeto do posto com os medicamentosConstam atualizados e ordenados
+            $postoDetalhe['medicamentosConstam'] = $medicamentosConstam->toArray();
+            return $postoDetalhe;
+        });
+    }
+    
     public function calcularDisponibilidadePorLote(Collection $ocorrenciasOrdenadas, array $listaMediFront): Collection
     {
         // Cria um mapa para buscar rapidamente a quantidade solicitada pelo ID do medicamento
@@ -185,95 +274,6 @@ class VerificaDisponibilidadeController extends Controller
         return $postosLotesDisponiveis;
     }
 
-    //verificar na tabela estoque as ocorrências dos postos com todos os medicamentos solicitados 
-    public function getOcorrenciaEstque(array $medIdsSolicitados)
-    {
-        $countMedicamentos = count($medIdsSolicitados);
-
-        // 1. Encontra os IDs dos postos que possuem TODOS os medicamentos (Filtro inicial)
-        $pComTodosMedicamentos = Estoque::select('id_postoFK')
-            ->whereIn('id_medicamentoFK', $medIdsSolicitados)
-            ->groupBy('id_postoFK')
-            // Condição HAVING: Posto é elegível se tiver registros para TODOS os medicamentos
-            ->havingRaw('COUNT(DISTINCT id_medicamentoFK) = ?', [$countMedicamentos])
-            ->pluck('id_postoFK')
-            ->toArray();
-        if (empty($pComTodosMedicamentos)) {
-            return $this->solicitacaoIndisponivel();
-        } else {
-
-            // 2. Busca os registros de ESTOQUE brutos para os postos e medicamentos aptos
-            $estoquesAptos = Estoque::select(
-                'id_postoFK',
-                'id_medicamentoFK',
-                'qtt_entrada',
-                'lote',
-                'data_entrada'
-            )
-                ->whereIn('id_postoFK', $pComTodosMedicamentos)
-                ->whereIn('id_medicamentoFK', $medIdsSolicitados)
-                ->get();
-
-
-            // 3. Estrutura a coleção para o formato desejado (agrupado por Posto)
-            $estoqueAgrupado = $estoquesAptos->groupBy('id_postoFK')->map(function ($itensPorPosto, $idPosto) {
-
-                // Agrupa os itens por id_medicamentoFK dentro do posto
-                $detalhesPorMedicamento = $itensPorPosto->groupBy('id_medicamentoFK')->map(function ($lotesPorMedicamento, $idMedicamento) {
-
-                    // Mapeia para uma coleção simples dos lotes (como no seu exemplo)
-                    return $lotesPorMedicamento->map(function ($lote) {
-                        return [
-                            'idMedicamento' => $lote->id_medicamentoFK, // Usando 'id' como chave para o medicamento
-                            'qtt_entrada' => $lote->qtt_entrada,
-                            'lote' => $lote->lote,
-                            'data_entrada' => $lote->data_entrada,
-                        ];
-                    })->values()->toArray(); // Retorna um array simples de lotes para o medicamento
-                });
-
-                return [
-                    'id_postoFK' => $idPosto,
-                    'medicamentosConstam' => $detalhesPorMedicamento->toArray()
-                ];
-            })->values(); // Converte o mapa de volta para uma coleção sequencial
-
-            // dd($estoqueAgrupado);
-            return $estoqueAgrupado;
-
-        }
-
-    }
-
-    /**
-     * Itera sobre a coleção de ocorrências com estoque e ordena os lotes
-     * de cada medicamento dentro de cada posto pela data de entrada (FIFO).
-     *
-     * @param Collection $ocorrenciasBrutas Coleção retornada de getOcorrenciaEstque.
-     * @return Collection Coleção com a mesma estrutura, mas lotes ordenados.
-     */
-    public function ordenarLotesPorFIFO(Collection $ocorrenciasBrutas): Collection
-    {
-        // iterar sobre cada Posto na coleção
-        return $ocorrenciasBrutas->map(function ($postoDetalhe) {
-
-            $medicamentosConstam = collect($postoDetalhe['medicamentosConstam'])->map(function ($lotesDoMedicamento) {
-
-                // Transforma o array de lotes em uma Coleção do Laravel para usar o sortBy
-                $lotesCollection = collect($lotesDoMedicamento);
-
-                // Aplica a ordenação: do mais antigo (ASC) ao mais recente pela 'data_entrada'
-                $lotesOrdenados = $lotesCollection->sortBy('data_entrada')->values()->toArray();
-
-                return $lotesOrdenados;
-            });
-
-            // Retorna o objeto do posto com os medicamentosConstam atualizados e ordenados
-            $postoDetalhe['medicamentosConstam'] = $medicamentosConstam->toArray();
-            return $postoDetalhe;
-        });
-    }
-
     /**
      * Método Otimizado (SQL): Faz a busca, soma, e subtração das saídas PENDENTES por lote (FIFO).
      * (Cobre as caixas 1, 2 e 3 do seu fluxograma de uma só vez).
@@ -294,8 +294,7 @@ class VerificaDisponibilidadeController extends Controller
         return Estoque::select(
             'estoque.lote',
             'estoque.data_entrada',
-            // CORREÇÃO DO ERRO 1055: Envolvemos a expressão de saldo com SUM() ou MAX()
-            // para satisfazer o strict mode, pois a agregação lógica já ocorreu.
+            // CORREÇÃO DO ERRO 1055: envolver a expressão de saldo com SUM()
             DB::raw('SUM(estoque.qtt_entrada) - IFNULL(MAX(saidas.total_saidas_pendentes), 0) as estoque_disponivel')
         )
             ->leftJoinSub($saidasPorLote, 'saidas', function ($join) {
