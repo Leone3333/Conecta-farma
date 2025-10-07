@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +25,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .logo-section {
@@ -78,7 +79,7 @@
         .pharmacy-icon {
             width: 40px;
             height: 40px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -125,11 +126,25 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
         }
-
-        .add-btn::before {
-            content: '+';
+        
+        .check-btn {
+            background: linear-gradient(135deg, #7fd6a3ff, #23b679ff);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 219, 141, 0.3);
+            display: flex;
+            align-items: center;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
         }
 
         .codes-container {
@@ -144,7 +159,7 @@
             border-radius: 15px;
             padding: 25px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
         }
@@ -174,6 +189,13 @@
             background: rgba(52, 152, 219, 0.1);
             border-radius: 8px;
             display: inline-block;
+        }
+
+        .btn-div{
+            display:flex;
+            width: 90%;
+            height: auto;
+            justify-content: end; 
         }
 
         .medication-info {
@@ -256,7 +278,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
         }
 
@@ -270,7 +292,7 @@
             border-radius: 15px;
             width: 90%;
             max-width: 500px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
         .modal-header {
@@ -358,6 +380,7 @@
         }
     </style>
 </head>
+
 <body>
     <header class="header">
         <div class="logo-section">
@@ -370,6 +393,7 @@
             </div>
         </div>
         <div class="header-right">
+            <div class="matricula-funcionario">{{session('login')->matricula}}</div>
             <div class="conecta-farmacia">Conecta farmácia</div>
             <div class="pharmacy-icon">💊</div>
         </div>
@@ -377,74 +401,28 @@
 
     <main class="main-content">
         <div class="content-header">
-            <h1 class="page-title">Lista dos códigos de retirada</h1>
+            <h1 class="page-title">Lista das retiradas {{ $posto->nome}}</h1>
             <button class="add-btn" onclick="openModal()">Adicionar medicamento</button>
         </div>
 
         <div class="codes-container" id="codesContainer">
-            <div class="code-card">
-                <div class="card-actions">
-                    <button class="action-btn edit-btn" onclick="editCard(this)">✎</button>
-                    <button class="action-btn delete-btn" onclick="deleteCard(this)">✕</button>
-                </div>
-                <div class="code-number">#C4U6777</div>
-                <div class="medication-info">
-                    <div class="medication-item">
-                        <span class="medication-name">Buscopan</span>
-                        <span class="medication-quantity">1</span>
-                    </div>
-                </div>
-            </div>
 
-            <div class="code-card">
+            <!-- 
                 <div class="card-actions">
                     <button class="action-btn edit-btn" onclick="editCard(this)">✎</button>
                     <button class="action-btn delete-btn" onclick="deleteCard(this)">✕</button>
                 </div>
-                <div class="code-number">#BNU6777</div>
-                <div class="medication-info">
-                    <div class="medication-item">
-                        <span class="medication-name">Buscopan</span>
-                        <span class="medication-quantity">4</span>
-                    </div>
-                    <div class="medication-item">
-                        <span class="medication-name">Dipirona</span>
-                        <span class="medication-quantity">2</span>
-                    </div>
-                </div>
-            </div>
+                -->
+            @foreach ($retiradas as $retirada)
 
-            <div class="code-card">
-                <div class="card-actions">
-                    <button class="action-btn edit-btn" onclick="editCard(this)">✎</button>
-                    <button class="action-btn delete-btn" onclick="deleteCard(this)">✕</button>
-                </div>
-                <div class="code-number">#YU89NG7</div>
-                <div class="medication-info">
-                    <div class="medication-item">
-                        <span class="medication-name">Nimesulida</span>
-                        <span class="medication-quantity">2</span>
+                <form action="/confirmar" method="post">
+                    <div class="code-card">
+                        <div class="code-number">{{ $retirada->cod_saida }}</div>
+                        <div class="btn-div"><button class="check-btn">enviar</button></div>
                     </div>
-                </div>
-            </div>
+                </form>
+            @endforeach
 
-            <div class="code-card">
-                <div class="card-actions">
-                    <button class="action-btn edit-btn" onclick="editCard(this)">✎</button>
-                    <button class="action-btn delete-btn" onclick="deleteCard(this)">✕</button>
-                </div>
-                <div class="code-number">#CHT6009</div>
-                <div class="medication-info">
-                    <div class="medication-item">
-                        <span class="medication-name">Imosec</span>
-                        <span class="medication-quantity">6</span>
-                    </div>
-                    <div class="medication-item">
-                        <span class="medication-name">Decongex</span>
-                        <span class="medication-quantity">2</span>
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 
@@ -504,7 +482,7 @@
         function createMedicationCard(code, medications) {
             const card = document.createElement('div');
             card.className = 'code-card';
-            
+
             let medicationItems = '';
             medications.forEach(med => {
                 medicationItems += `
@@ -530,14 +508,14 @@
         }
 
         function addMedication(code, medicationName, quantity) {
-            const medications = [{name: medicationName, quantity: quantity}];
+            const medications = [{ name: medicationName, quantity: quantity }];
             const card = createMedicationCard(code, medications);
-            
+
             // Add with animation
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
             document.getElementById('codesContainer').appendChild(card);
-            
+
             setTimeout(() => {
                 card.style.transition = 'all 0.5s ease';
                 card.style.opacity = '1';
@@ -550,11 +528,11 @@
             const code = card.querySelector('.code-number').textContent;
             const firstMedication = card.querySelector('.medication-name').textContent;
             const firstQuantity = card.querySelector('.medication-quantity').textContent;
-            
+
             document.getElementById('codeInput').value = code;
             document.getElementById('medicationInput').value = firstMedication;
             document.getElementById('quantityInput').value = firstQuantity;
-            
+
             editingCard = card;
             document.querySelector('.modal-header').textContent = 'Editar Medicamento';
             document.getElementById('medicationModal').style.display = 'block';
@@ -563,31 +541,31 @@
         function deleteCard(button) {
             const card = button.closest('.code-card');
             const code = card.querySelector('.code-number').textContent;
-            
+
             if (confirm(`Tem certeza que deseja excluir o código ${code}?`)) {
                 card.style.transition = 'all 0.3s ease';
                 card.style.transform = 'scale(0.8)';
                 card.style.opacity = '0';
-                
+
                 setTimeout(() => {
                     card.remove();
                 }, 300);
             }
         }
 
-        document.getElementById('medicationForm').addEventListener('submit', function(e) {
+        document.getElementById('medicationForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
             const code = document.getElementById('codeInput').value || generateCode();
             const medicationName = document.getElementById('medicationInput').value;
             const quantity = document.getElementById('quantityInput').value;
-            
+
             if (editingCard) {
                 // Update existing card
                 editingCard.querySelector('.code-number').textContent = code;
                 editingCard.querySelector('.medication-name').textContent = medicationName;
                 editingCard.querySelector('.medication-quantity').textContent = quantity;
-                
+
                 // Add update animation
                 editingCard.style.transform = 'scale(1.05)';
                 editingCard.style.background = 'rgba(52, 152, 219, 0.1)';
@@ -599,12 +577,12 @@
                 // Add new card
                 addMedication(code, medicationName, quantity);
             }
-            
+
             closeModal();
         });
 
         // Close modal when clicking outside
-        window.addEventListener('click', function(e) {
+        window.addEventListener('click', function (e) {
             const modal = document.getElementById('medicationModal');
             if (e.target === modal) {
                 closeModal();
@@ -612,12 +590,12 @@
         });
 
         // Add some interactive animations
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const cards = document.querySelectorAll('.code-card');
             cards.forEach((card, index) => {
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(30px)';
-                
+
                 setTimeout(() => {
                     card.style.transition = 'all 0.6s ease';
                     card.style.opacity = '1';
@@ -627,4 +605,5 @@
         });
     </script>
 </body>
+
 </html>

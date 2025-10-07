@@ -228,6 +228,10 @@
             @if (session('erroLogin'))
                 <p class="pickup-subtitle"><br>{{session('erroLogin')}}</p>
             @endif
+            
+            @if (session('0retirada'))
+                <p class="pickup-subtitle"><br>{{session('0retirada')}}</p>
+            @endif
             <!-- <div class="forgot-password">
                 <a href="#" onclick="showForgotPassword()">Esqueci minha senha</a>
             </div>

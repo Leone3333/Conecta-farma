@@ -28,4 +28,4 @@ Route::post('/postoEscolhido', [ConfirmarSoliController::class, 'solicitarRetira
 // Módulo de funcionários
 Route::get('/login', function () {return view('index');});
 Route::post('/login', [AcessoController::class, 'login']);
-Route::get('/codigoRetirada', function () {return view('codigoRetirada');})->name('codigos');
+// Route::get('/codigoRetirada', function () {return view('codigoRetirada');})->name('codigos');
