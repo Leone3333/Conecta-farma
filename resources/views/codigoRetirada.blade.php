@@ -126,7 +126,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
         }
-        
+
         .check-btn {
             background: linear-gradient(135deg, #7fd6a3ff, #23b679ff);
             color: white;
@@ -191,11 +191,11 @@
             display: inline-block;
         }
 
-        .btn-div{
-            display:flex;
+        .btn-div {
+            display: flex;
             width: 90%;
             height: auto;
-            justify-content: end; 
+            justify-content: end;
         }
 
         .medication-info {
@@ -415,9 +415,14 @@
                 -->
             @foreach ($retiradas as $retirada)
 
-                <form action="/confirmar" method="post">
+                <form action="/selecionarRetirada" method="post">
+                    @csrf
                     <div class="code-card">
                         <div class="code-number">{{ $retirada->cod_saida }}</div>
+                        
+                        {{-- id retirada --}}  
+                        <input type="hidden" name="retirada" value="{{ $retirada->id_retirada }}">
+                        
                         <div class="btn-div"><button class="check-btn">enviar</button></div>
                     </div>
                 </form>

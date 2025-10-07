@@ -4,8 +4,8 @@ use App\Models\Medicamento;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AcessoController;
 use App\Http\Controllers\ConfirmarSoliController;
-use App\Http\Controllers\SolicitarRetiController;
 use App\Http\Controllers\SolicitarRetiradaController;
+use App\Http\Controllers\PermitirRetirada;
 
 Route::get('/', function () {return view('welcome');});
 
@@ -29,3 +29,6 @@ Route::post('/postoEscolhido', [ConfirmarSoliController::class, 'solicitarRetira
 Route::get('/login', function () {return view('index');});
 Route::post('/login', [AcessoController::class, 'login']);
 // Route::get('/codigoRetirada', function () {return view('codigoRetirada');})->name('codigos');
+
+Route::get('/permitir', function(){ return view('permitirRetirada');});
+Route::post('/selecionarRetirada',[PermitirRetirada::class, 'dataRetirada']);
