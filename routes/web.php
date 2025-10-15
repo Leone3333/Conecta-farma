@@ -20,7 +20,7 @@ Route::get('/ProcurarUbs', function () {return view('ProcurarUbs');});
 
 Route::get('/confirmar-retirada', function () {return view('confirmarRetirada');});
 
-Route::post('/postoEscolhido', [ConfirmarSoliController::class, 'solicitarRetirada']);
+Route::post('/postoEscolhido', [ConfirmarSoliController::class, 'selecionaPosto']);
 // Se encontra em api.php
 // Route::post('/ConfirmarRetirada', [ConfirmarSoliController::class, 'confirmar']);    
 

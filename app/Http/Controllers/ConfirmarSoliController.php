@@ -55,7 +55,7 @@ class ConfirmarSoliController extends Controller
         ]);
     }
 
-    public function solicitarRetirada(Request $request)
+    public function selecionaPosto(Request $request)
     {
         $retiradaPosto = $request->input('idPosto');
         $nomePosto = Postos_saude::find($retiradaPosto)->nome;

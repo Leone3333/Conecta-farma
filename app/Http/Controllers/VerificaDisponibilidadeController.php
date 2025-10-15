@@ -287,7 +287,7 @@ class VerificaDisponibilidadeController extends Controller
             ->where('retiradas.id_postoFK', $idPosto)
             ->where('itens_retirados.id_medicamentoFK', $idMedicamento)
             // CORREÇÃO DE SINTAXE: Onde 'Pendente' é uma string, use aspas.
-            ->where('retiradas.status', ['Pendente','Negada'])
+            ->where('retiradas.status', ['Pendente','Negada', 'Aprovada'])
             ->groupBy('itens_retirados.lote');
 
         // 2. Consulta Principal: Subtração e Checagem (> 0)

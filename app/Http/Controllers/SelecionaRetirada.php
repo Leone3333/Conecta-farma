@@ -8,7 +8,7 @@ use App\Models\Itens_retirados;
 use Illuminate\Support\Facades\DB;
 
 
-class PermitirRetirada extends Controller
+class SelecionaRetirada extends Controller
 {
     public function dataRetirada(Request $request)
     {
@@ -33,7 +33,7 @@ class PermitirRetirada extends Controller
             'dataRetirada' => $dataRetirada
         ]);
     }
-    public function alterarStatus(Request $request)
+    public function AutorizarRetirada(Request $request)
     {
         $idRetirada = $request->input('retirada');
 

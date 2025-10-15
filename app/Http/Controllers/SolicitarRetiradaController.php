@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Estoque;
-use App\Models\Retiradas;
-use App\Models\Itens_retirados;
-use App\Models\Postos_saude;
+// use App\Models\Estoque;
+// use App\Models\Retiradas;
+// use App\Models\Itens_retirados;
+// use App\Models\Postos_saude;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
