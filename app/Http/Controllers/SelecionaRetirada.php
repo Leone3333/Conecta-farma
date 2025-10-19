@@ -20,6 +20,7 @@ class SelecionaRetirada extends Controller
         ->select(
             'medicamentos.nome',
              'itens_retirados.qtt_saida',
+             'itens_retirados.lote',
         )
         ->where('itens_retirados.id_retiradaFK', $idRetirada)
         ->get();
@@ -28,14 +29,9 @@ class SelecionaRetirada extends Controller
 
         // dd($dataRetirada);
 
-        return view('/permitirRetirada', [
+        return view('/autorizarRetirada', [
             'dataItensRetirada' => $dataItensRetirada,
             'dataRetirada' => $dataRetirada
         ]);
-    }
-    public function AutorizarRetirada(Request $request)
-    {
-        $idRetirada = $request->input('retirada');
-
     }
 }

@@ -41,7 +41,7 @@ function confirmRequest() {
     };
 
     // Fazendo a requisição POST para o seu endpoint no Laravel
-    fetch(API_URL, { // Mude '/api/confirmar' para a sua rota
+    fetch(API_URL, { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ function confirmRequest() {
                 ✅ Solicitação enviada com sucesso!<br><br>
                 <strong>Código único: ${data.codigo}</strong><br><br>
                 <small>Apresente este código na unidade de saúde junto com os documentos.</small><br><br>
-                <a href='/solicitar'><button class="btn btn-back">Sair</button></a>
+                <a href='/'><button class="btn btn-back">Sair</button></a>
             `;
             } else {
                 // Lógica para lidar com erros

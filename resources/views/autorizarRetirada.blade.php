@@ -97,12 +97,12 @@
             white-space: nowrap;
         }
 
-        .btns{
-            display:flex;
+        .btns {
+            display: flex;
             justify-content: end;
-            width:100%;
-            padding:12px;
-            gap:10px;
+            width: 100%;
+            padding: 12px;
+            gap: 10px;
         }
 
         .btn-acao {
@@ -171,60 +171,50 @@
     <div class="retirada-container">
         <div class="retirada-card">
 
-            {{-- Simulação de dados do Laravel
-            @php
-            // Simulação dos dados que viriam do Controller
-            $solicitacao = (object)[
-            'id' => 123,
-            'codigo_unico' => 'C4U6777',
-            'itens' => [
-            (object)['id' => 101, 'nome_medicamento' => 'Buscopan', 'quantidade_solicitada' => 1],
-            (object)['id' => 102, 'nome_medicamento' => 'Nimesulida', 'quantidade_solicitada' => 3],
-            ]
-            ];
-            // Rota de exemplo (no Laravel isso viria de route('api.confirmar_acao_funcionario'))
-            $rota_api = '/api/processar_acao_funcionario';
-            @endphp
-            --}}
-           
             <h2 class="solicitacao-titulo">Permitir retirada {{$dataRetirada->cod_saida}}</h2>
+
 
             <table class="medicamentos-tabela">
                 <thead>
                     <tr>
                         <th>Medicamento</th>
                         <th>Quantidade</th>
+                        <th>Lote</th>
                     </tr>
                 </thead>
                 <tbody id="itensTabela">
-                   
+
                     @foreach($dataItensRetirada as $listaItens)
-                    <tr>
-                        <td>{{$listaItens->nome}}</td>
-                        <td>{{$listaItens->qtt_saida}}</td>
-                    </tr>
+                        <tr>
+                            <td>{{$listaItens->nome}}</td>
+                            <td>{{$listaItens->qtt_saida}}</td>
+                            <td>{{$listaItens->lote}}</td>
+                        </tr>
                     @endforeach()
                 </tbody>
             </table>
 
             <p class="alerta-status" id="alertaStatus"></p>
 
+           
             <div class="btns">
 
-                <form action="/" method="post">
-                    <input type="hidden" name="retirada" value="">
-                    <input type="hidden" name="status" value="Negado">
-                    
-                    <button class="btn-acao btn-rejeitar" onclick="confirmarAcao('rejeitar')" title="Rejeitar Retirada">
+                <form action="/autorizar" method="post">
+                    @csrf
+                    <input type="hidden" name="retirada" value="{{$dataRetirada->id_retirada}}">
+                    <input type="hidden" name="status" value="Negada">
+
+                    <button class="btn-acao btn-rejeitar" title="Rejeitar Retirada">
                         <i class="icone-acao">❌</i>
                     </button>
                 </form>
-                
-                <form action="/" method="post">
-                    <input type="hidden" name="retirada" value="">
-                    <input type="hidden" name="status" value="Permitida">
-                    
-                    <button class="btn-acao btn-aprovar" onclick="confirmarAcao('aprovar')" title="Confirmar Retirada">
+
+                <form action="/autorizar" method="post">
+                    @csrf
+                    <input type="hidden" name="retirada" value="{{$dataRetirada->id_retirada}}">
+                    <input type="hidden" name="status" value="Aprovada">
+
+                    <button class="btn-acao btn-aprovar" title="Confirmar Retirada">
                         <i class="icone-acao">✔️</i>
                     </button>
                 </form>

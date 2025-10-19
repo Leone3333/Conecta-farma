@@ -77,7 +77,7 @@
                 <p style="margin-bottom: 20px; color: #7f8c8d;">Tem certeza que deseja cancelar esta solicitação?</p>
                 <div style="display: flex; gap: 15px; justify-content: center;">
                     <button class="btn" style="background: #95a5a6; color: white;" onclick="closeModal()">Não</button>
-                    <button class="btn btn-cancel" onclick="confirmCancel()"><a href="/solicitar">Sim, cancelar</a></button>
+                    <button class="btn btn-cancel" onclick="confirmCancel()"><a href="/">Sim, cancelar</a></button>
                 </div>
             </div>
         </div>

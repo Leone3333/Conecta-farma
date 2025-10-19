@@ -12,9 +12,10 @@ class AcessoController extends Controller
     // Função para logar no sistema
     public function login(Request $request)
     {   
-        if (!session()->has('login')) {
-            return redirect()->route('login');
-        }
+
+        // if (!session()->has('login')) {
+        //     return redirect()->route('login');
+        // }
 
         if (!isset($request)) {
             return back()->with('erroLogin', 'Por favor digite valores validos');
@@ -36,6 +37,7 @@ class AcessoController extends Controller
                     }
                     
                     $posto = Postos_saude::where('id_posto',$funcionario->id_postoFK)->first();
+                    session()->put('login', $funcionario);
                     session()->put('login', $funcionario);
                     return view('codigoRetirada', ['retiradas' => $retiradas, 'posto' => $posto]);
                 }
