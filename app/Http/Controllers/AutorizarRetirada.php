@@ -4,23 +4,45 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Retiradas;
+use App\Models\Medicamento;
+use App\Models\Postos_saude;
 
 
 class AutorizarRetirada extends Controller
 {
-      public function updateRetirada(Request $request)
+
+    public function __construct(AcessoController $acessoController)
     {
-        
+        $this->acessoController = $acessoController;
+
+    }
+    public function updateRetirada(Request $request)
+    {
+
         $idRetirada = $request->input('retirada');
         $newStatus = $request->input('status');
         // dump($idRetirada);
-        
+
 
         $retiradaUpdate = Retiradas::find($idRetirada);
-       
+
         $retiradaUpdate->status = $newStatus;
         $retiradaUpdate->save();
 
-        return view('codigoRetirada');
+        return $this->codigosDoPosto();
+    }
+
+    public function codigosDoPosto()
+    {
+        if (!session()->has('login')) {
+            return redirect()->route('login');
+        } else {
+            $idPosto = session('login')->id_postoFK;
+            $posto = Postos_saude::where('id_posto', $idPosto )->first();
+            $retiradas = $this->acessoController->retiradasAssociadas($idPosto );
+
+            return view('codigoRetirada', ['retiradas' => $retiradas, 'posto' => $posto, 'medicamentos' => Medicamento::all()]);
+           
+        }
     }
 }

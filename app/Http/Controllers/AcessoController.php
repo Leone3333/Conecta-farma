@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Funcionario;
 use App\Models\Retiradas;
 use App\Models\Postos_saude;
+use App\Models\Medicamento;
 use Illuminate\Http\Request;
 
 class AcessoController extends Controller
@@ -38,8 +39,7 @@ class AcessoController extends Controller
                     
                     $posto = Postos_saude::where('id_posto',$funcionario->id_postoFK)->first();
                     session()->put('login', $funcionario);
-                    session()->put('login', $funcionario);
-                    return view('codigoRetirada', ['retiradas' => $retiradas, 'posto' => $posto]);
+                    return view('codigoRetirada', ['retiradas' => $retiradas, 'posto' => $posto, 'medicamentos' => Medicamento::all()]);
                 }
             return back()->with('erroLogin', 'Usuario não cadastrado tente novamente ou avise ao suporte tecnico');
         }

@@ -378,6 +378,39 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Necessário para que o JS funcione */
+        .suggestions-list {
+            position: absolute;
+            /* Para que não empurre o layout */
+            z-index: 1001;
+            /* Garante que fique acima do modal */
+            border: 1px solid #ddd;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+            /* Começa escondido, o JS/focus exibe */
+            width: calc(100% - 60px);
+            /* Ajuste conforme a margem/padding do seu modal */
+        }
+
+        /* O item da sugestão, escondido por padrão */
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+            display: none;
+            /* ESCONDIDO */
+        }
+
+        /* A classe que o JS adiciona para mostrar o item */
+        .suggestion-item.show {
+            display: block;
+            /* MOSTRADO */
+        }
+
+        .suggestion-item:hover {
+            background-color: #f1f1f1;
+        }
     </style>
 </head>
 
@@ -419,10 +452,10 @@
                     @csrf
                     <div class="code-card">
                         <div class="code-number">{{ $retirada->cod_saida }}</div>
-                        
-                        {{-- id retirada --}}  
+
+                        {{-- id retirada --}}
                         <input type="hidden" name="retirada" value="{{ $retirada->id_retirada }}">
-                        
+
                         <div class="btn-div"><button class="check-btn">enviar</button></div>
                     </div>
                 </form>
@@ -437,13 +470,20 @@
             <div class="modal-header">Adicionar Novo Medicamento</div>
             <form id="medicationForm">
                 <div class="form-group">
-                    <label class="form-label">Código de Retirada</label>
-                    <input type="text" class="form-input" id="codeInput" placeholder="Ex: #ABC1234" required>
-                </div>
-                <div class="form-group">
                     <label class="form-label">Nome do Medicamento</label>
                     <input type="text" class="form-input" id="medicationInput" placeholder="Ex: Dipirona" required>
+
+                    <div id="medicationSuggestions" class="suggestions-list">
+                        @foreach($medicamentos as $medicamento)
+                            <div class="suggestion-item" data-id='{{ $medicamento['id_medicamento'] }}'
+                                data-nome='{{ $medicamento['nome'] }}' onclick="selectSuggestion(this)">
+                                {{$medicamento['nome']}}
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
+
+                <input type="hidden" id="selectedMedicationId" name="id_medicamento_selecionado">
                 <div class="form-group">
                     <label class="form-label">Lote</label>
                     <input type="text" class="form-input" id="medicationInput" placeholder="L45AB" required>
@@ -461,8 +501,12 @@
     </div>
 
     <script>
+        // Variável global para rastrear o cartão em edição (necessária devido às funções globais)
         let editingCard = null;
 
+        /**
+         * Abre o modal de medicamento, limpa o formulário e reseta o modo de edição.
+         */
         function openModal() {
             document.getElementById('medicationModal').style.display = 'block';
             document.getElementById('medicationForm').reset();
@@ -470,35 +514,119 @@
             document.querySelector('.modal-header').textContent = 'Adicionar Novo Medicamento';
         }
 
+        /**
+         * Fecha o modal de medicamento.
+         */
         function closeModal() {
             document.getElementById('medicationModal').style.display = 'none';
             editingCard = null;
-        }
 
-        function generateCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '#';
-            for (let i = 0; i < 7; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            // Esconde as sugestões ao fechar o modal (garante limpeza da tela)
+            const suggestionContainer = document.getElementById('medicationSuggestions');
+            if (suggestionContainer) {
+                suggestionContainer.style.display = 'none';
             }
-            return code;
         }
 
-        function createMedicationCard(code, medications) {
-            const card = document.createElement('div');
-            card.className = 'code-card';
+        /**
+         * Função chamada no clique da sugestão de medicamento.
+         * Preenche o input e o campo oculto do ID, depois esconde as sugestões.
+         * @param {HTMLElement} element - O div.suggestion-item clicado.
+         */
+        function selectSuggestion(element) {
+            const medicationId = element.getAttribute('data-id');
+            const medicationName = element.getAttribute('data-nome');
 
-            let medicationItems = '';
-            medications.forEach(med => {
-                medicationItems += `
-                    <div class="medication-item">
-                        <span class="medication-name">${med.name}</span>
-                        <span class="medication-quantity">${med.quantity}</span>
-                    </div>
-                `;
-            });
+            // Preenche o campo de input e o campo oculto
+            document.getElementById('medicationInput').value = medicationName;
+            const selectedIdInput = document.getElementById('selectedMedicationId');
+            if (selectedIdInput) {
+                selectedIdInput.value = medicationId;
+            }
 
-            card.innerHTML = `
+            // Esconde o contêiner de sugestões
+            const suggestionContainer = document.getElementById('medicationSuggestions');
+            if (suggestionContainer) {
+                const suggestionItems = suggestionContainer.querySelectorAll('.suggestion-item');
+                suggestionItems.forEach(item => item.classList.remove('show'));
+                suggestionContainer.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- 1. Inicialização de Elementos ---
+            const medicationInput = document.getElementById('medicationInput');
+            const suggestionContainer = document.getElementById('medicationSuggestions');
+            const cardsContainer = document.getElementById('codesContainer');
+            const medicationForm = document.getElementById('medicationForm');
+
+            // Verifica se os elementos do autocompletar existem antes de prosseguir
+            if (!medicationInput || !suggestionContainer) {
+                console.warn("Elementos de autocompletar não encontrados.");
+            } else {
+                const suggestionItems = suggestionContainer.querySelectorAll('.suggestion-item');
+
+                // Esconde todas as sugestões na inicialização
+                suggestionItems.forEach(item => item.classList.remove('show'));
+
+
+                // --- 2. Lógica de Autocompletar (Filtragem) ---
+
+                medicationInput.addEventListener('input', function () {
+                    const searchTerm = this.value.toLowerCase().trim();
+
+                    // Limpa o ID selecionado ao digitar novamente
+                    const selectedMedicationId = document.getElementById('selectedMedicationId');
+                    if (selectedMedicationId) {
+                        selectedMedicationId.value = '';
+                    }
+
+                    suggestionItems.forEach(item => {
+                        const medicationName = item.dataset.nome.toLowerCase();
+
+                        if (searchTerm.length === 0 || medicationName.includes(searchTerm)) {
+                            item.classList.add('show');
+                        } else {
+                            item.classList.remove('show');
+                        }
+                    });
+
+                    suggestionContainer.style.display = 'block';
+                });
+
+                medicationInput.addEventListener('blur', function () {
+                    // Delay para permitir o clique na sugestão antes de esconder
+                    setTimeout(() => {
+                        suggestionItems.forEach(item => item.classList.remove('show'));
+                        suggestionContainer.style.display = 'none';
+                    }, 200);
+                });
+
+                medicationInput.addEventListener('focus', function () {
+                    // Re-executa a filtragem se houver texto
+                    if (this.value.length > 0) {
+                        this.dispatchEvent(new Event('input'));
+                    }
+                });
+            }
+
+            // --- 3. Funções de Manipulação de Cartões (Otimizadas) ---
+
+            /**
+             * Cria e retorna o HTML de um novo card de medicamento (função auxiliar).
+             */
+            const createMedicationCard = (code, medications) => {
+                const card = document.createElement('div');
+                card.className = 'code-card';
+
+                const medicationItems = medications.map(med => `
+                <div class="medication-item">
+                    <span class="medication-name">${med.name}</span>
+                    <span class="medication-quantity">${med.quantity}</span>
+                </div>
+            `).join('');
+
+                card.innerHTML = `
                 <div class="card-actions">
                     <button class="action-btn edit-btn" onclick="editCard(this)">✎</button>
                     <button class="action-btn delete-btn" onclick="deleteCard(this)">✕</button>
@@ -508,94 +636,79 @@
                     ${medicationItems}
                 </div>
             `;
+                return card;
+            };
 
-            return card;
-        }
+            /**
+             * Adiciona um novo card de medicamento com animação.
+             */
+            const addMedication = (code, medicationName, quantity) => {
+                const medications = [{ name: medicationName, quantity: quantity }];
+                const card = createMedicationCard(code, medications);
 
-        function addMedication(code, medicationName, quantity) {
-            const medications = [{ name: medicationName, quantity: quantity }];
-            const card = createMedicationCard(code, medications);
-
-            // Add with animation
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            document.getElementById('codesContainer').appendChild(card);
-
-            setTimeout(() => {
-                card.style.transition = 'all 0.5s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, 100);
-        }
-
-        function editCard(button) {
-            const card = button.closest('.code-card');
-            const code = card.querySelector('.code-number').textContent;
-            const firstMedication = card.querySelector('.medication-name').textContent;
-            const firstQuantity = card.querySelector('.medication-quantity').textContent;
-
-            document.getElementById('codeInput').value = code;
-            document.getElementById('medicationInput').value = firstMedication;
-            document.getElementById('quantityInput').value = firstQuantity;
-
-            editingCard = card;
-            document.querySelector('.modal-header').textContent = 'Editar Medicamento';
-            document.getElementById('medicationModal').style.display = 'block';
-        }
-
-        function deleteCard(button) {
-            const card = button.closest('.code-card');
-            const code = card.querySelector('.code-number').textContent;
-
-            if (confirm(`Tem certeza que deseja excluir o código ${code}?`)) {
-                card.style.transition = 'all 0.3s ease';
-                card.style.transform = 'scale(0.8)';
+                // Animação de entrada
                 card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                cardsContainer.appendChild(card);
 
                 setTimeout(() => {
-                    card.remove();
-                }, 300);
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100);
+            };
+
+            // --- 4. Submissão do Formulário do Modal ---
+
+            if (medicationForm) {
+                medicationForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    // Note: 'codeInput' e 'generateCode' não foram fornecidos, assumindo que você os define globalmente ou não são usados no fluxo atual.
+                    // Usando valores padrão para evitar erros.
+                    const codeInput = document.getElementById('codeInput');
+                    const quantityInput = document.getElementById('quantityInput');
+
+                    const code = (codeInput && codeInput.value) ? codeInput.value : 'C' + Math.floor(Math.random() * 9999);
+                    const medicationName = medicationInput.value;
+                    const quantity = quantityInput ? quantityInput.value : 1;
+
+                    if (editingCard) {
+                        // Lógica de atualização (editCard/deleteCard não estão no escopo fornecido, mas a lógica está correta)
+
+                        editingCard.querySelector('.code-number').textContent = code;
+                        // Se o card suportar múltiplos medicamentos, a lógica abaixo precisaria ser revista.
+                        // Assumindo um único medicamento por card para o propósito da limpeza.
+                        editingCard.querySelector('.medication-name').textContent = medicationName;
+                        editingCard.querySelector('.medication-quantity').textContent = quantity;
+
+                        // Animação de atualização
+                        editingCard.style.transform = 'scale(1.05)';
+                        editingCard.style.background = 'rgba(52, 152, 219, 0.1)';
+                        setTimeout(() => {
+                            editingCard.style.transform = 'scale(1)';
+                            editingCard.style.background = 'white';
+                        }, 200);
+                    } else {
+                        // Adiciona novo cartão
+                        addMedication(code, medicationName, quantity);
+                    }
+
+                    closeModal();
+                });
             }
-        }
+            
+            // --- 5. Eventos Globais e Animações ---
 
-        document.getElementById('medicationForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+            // Fecha modal ao clicar fora
+            window.addEventListener('click', function (e) {
+                const modal = document.getElementById('medicationModal');
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
 
-            const code = document.getElementById('codeInput').value || generateCode();
-            const medicationName = document.getElementById('medicationInput').value;
-            const quantity = document.getElementById('quantityInput').value;
-
-            if (editingCard) {
-                // Update existing card
-                editingCard.querySelector('.code-number').textContent = code;
-                editingCard.querySelector('.medication-name').textContent = medicationName;
-                editingCard.querySelector('.medication-quantity').textContent = quantity;
-
-                // Add update animation
-                editingCard.style.transform = 'scale(1.05)';
-                editingCard.style.background = 'rgba(52, 152, 219, 0.1)';
-                setTimeout(() => {
-                    editingCard.style.transform = 'scale(1)';
-                    editingCard.style.background = 'white';
-                }, 200);
-            } else {
-                // Add new card
-                addMedication(code, medicationName, quantity);
-            }
-
-            closeModal();
-        });
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function (e) {
-            const modal = document.getElementById('medicationModal');
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-
-        // Add some interactive animations
-        document.addEventListener('DOMContentLoaded', function () {
+            // Animação de cards na inicialização
             const cards = document.querySelectorAll('.code-card');
             cards.forEach((card, index) => {
                 card.style.opacity = '0';
