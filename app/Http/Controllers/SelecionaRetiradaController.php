@@ -8,7 +8,7 @@ use App\Models\Itens_retirados;
 use Illuminate\Support\Facades\DB;
 
 
-class SelecionaRetirada extends Controller
+class SelecionaRetiradaController extends Controller
 {
     public function dataRetirada(Request $request)
     {

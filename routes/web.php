@@ -5,8 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AcessoController;
 use App\Http\Controllers\ConfirmarSoliController;
 use App\Http\Controllers\SolicitarRetiradaController;
-use App\Http\Controllers\SelecionaRetirada;
-use App\Http\Controllers\AutorizarRetirada;
+use App\Http\Controllers\SelecionaRetiradaController;
+use App\Http\Controllers\AutorizarRetiradaController;
+use App\Http\Controllers\AdicionarMediController;
 
 
 // Módolo de usuarios
@@ -30,5 +31,7 @@ Route::get('/login', function () {return view('index');});
 Route::post('/login', [AcessoController::class, 'login']);
 Route::get('/selecionarRetirada',[AcessoController::class, 'login']);
 
-Route::post('/selecionarRetirada',[SelecionaRetirada::class, 'dataRetirada']);
-Route::post('/autorizar',[AutorizarRetirada::class, 'updateRetirada']);
+Route::post('/selecionarRetirada',[SelecionaRetiradaController::class, 'dataRetirada']);
+Route::post('/autorizar',[AutorizarRetiradaController::class, 'updateRetirada']);
+Route::post('/adicionar',[AdicionarMediController::class, 'add']);
+Route::get('/retiradas', [AutorizarRetiradaController::class, 'listaRetiradas'])->name('retiradas.index');

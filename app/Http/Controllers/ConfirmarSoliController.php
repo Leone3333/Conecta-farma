@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Retiradas;
 use App\Models\Itens_retirados;
-use App\Models\Estoque;
 use App\Models\Postos_saude;
 use App\Models\Medicamento;
 use Illuminate\Support\Facades\DB;

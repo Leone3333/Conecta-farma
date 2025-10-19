@@ -456,7 +456,7 @@
                         {{-- id retirada --}}
                         <input type="hidden" name="retirada" value="{{ $retirada->id_retirada }}">
 
-                        <div class="btn-div"><button class="check-btn">enviar</button></div>
+                        <div class="btn-div"><button class="check-btn">selecionar</button></div>
                     </div>
                 </form>
             @endforeach
@@ -468,7 +468,8 @@
     <div class="modal" id="medicationModal">
         <div class="modal-content">
             <div class="modal-header">Adicionar Novo Medicamento</div>
-            <form id="medicationForm">
+            <form action="/adicionar" method="post" id="medicationForm">
+                @csrf
                 <div class="form-group">
                     <label class="form-label">Nome do Medicamento</label>
                     <input type="text" class="form-input" id="medicationInput" placeholder="Ex: Dipirona" required>
@@ -484,13 +485,14 @@
                 </div>
 
                 <input type="hidden" id="selectedMedicationId" name="id_medicamento_selecionado">
+
                 <div class="form-group">
                     <label class="form-label">Lote</label>
-                    <input type="text" class="form-input" id="medicationInput" placeholder="L45AB" required>
+                    <input type="text" class="form-input" id="loteInput" name="lote" placeholder="Ex: L45AB" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Quantidade</label>
-                    <input type="number" class="form-input" id="quantityInput" min="1" placeholder="1" required>
+                    <input type="number" class="form-input" id="quantityInput" name="quantidade" min="1" placeholder="1" required>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="modal-btn btn-cancel" onclick="closeModal()">Cancelar</button>
@@ -610,95 +612,7 @@
                 });
             }
 
-            // --- 3. Funções de Manipulação de Cartões (Otimizadas) ---
-
-            /**
-             * Cria e retorna o HTML de um novo card de medicamento (função auxiliar).
-             */
-            const createMedicationCard = (code, medications) => {
-                const card = document.createElement('div');
-                card.className = 'code-card';
-
-                const medicationItems = medications.map(med => `
-                <div class="medication-item">
-                    <span class="medication-name">${med.name}</span>
-                    <span class="medication-quantity">${med.quantity}</span>
-                </div>
-            `).join('');
-
-                card.innerHTML = `
-                <div class="card-actions">
-                    <button class="action-btn edit-btn" onclick="editCard(this)">✎</button>
-                    <button class="action-btn delete-btn" onclick="deleteCard(this)">✕</button>
-                </div>
-                <div class="code-number">${code}</div>
-                <div class="medication-info">
-                    ${medicationItems}
-                </div>
-            `;
-                return card;
-            };
-
-            /**
-             * Adiciona um novo card de medicamento com animação.
-             */
-            const addMedication = (code, medicationName, quantity) => {
-                const medications = [{ name: medicationName, quantity: quantity }];
-                const card = createMedicationCard(code, medications);
-
-                // Animação de entrada
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                cardsContainer.appendChild(card);
-
-                setTimeout(() => {
-                    card.style.transition = 'all 0.5s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, 100);
-            };
-
-            // --- 4. Submissão do Formulário do Modal ---
-
-            if (medicationForm) {
-                medicationForm.addEventListener('submit', function (e) {
-                    e.preventDefault();
-
-                    // Note: 'codeInput' e 'generateCode' não foram fornecidos, assumindo que você os define globalmente ou não são usados no fluxo atual.
-                    // Usando valores padrão para evitar erros.
-                    const codeInput = document.getElementById('codeInput');
-                    const quantityInput = document.getElementById('quantityInput');
-
-                    const code = (codeInput && codeInput.value) ? codeInput.value : 'C' + Math.floor(Math.random() * 9999);
-                    const medicationName = medicationInput.value;
-                    const quantity = quantityInput ? quantityInput.value : 1;
-
-                    if (editingCard) {
-                        // Lógica de atualização (editCard/deleteCard não estão no escopo fornecido, mas a lógica está correta)
-
-                        editingCard.querySelector('.code-number').textContent = code;
-                        // Se o card suportar múltiplos medicamentos, a lógica abaixo precisaria ser revista.
-                        // Assumindo um único medicamento por card para o propósito da limpeza.
-                        editingCard.querySelector('.medication-name').textContent = medicationName;
-                        editingCard.querySelector('.medication-quantity').textContent = quantity;
-
-                        // Animação de atualização
-                        editingCard.style.transform = 'scale(1.05)';
-                        editingCard.style.background = 'rgba(52, 152, 219, 0.1)';
-                        setTimeout(() => {
-                            editingCard.style.transform = 'scale(1)';
-                            editingCard.style.background = 'white';
-                        }, 200);
-                    } else {
-                        // Adiciona novo cartão
-                        addMedication(code, medicationName, quantity);
-                    }
-
-                    closeModal();
-                });
-            }
-            
-            // --- 5. Eventos Globais e Animações ---
+            // --- . Eventos Globais e Animações ---
 
             // Fecha modal ao clicar fora
             window.addEventListener('click', function (e) {

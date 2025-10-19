@@ -8,7 +8,7 @@ use App\Models\Medicamento;
 use App\Models\Postos_saude;
 
 
-class AutorizarRetirada extends Controller
+class AutorizarRetiradaController extends Controller
 {
 
     public function __construct(AcessoController $acessoController)
@@ -29,10 +29,10 @@ class AutorizarRetirada extends Controller
         $retiradaUpdate->status = $newStatus;
         $retiradaUpdate->save();
 
-        return $this->codigosDoPosto();
+        return redirect()->route('retiradas.index');
     }
 
-    public function codigosDoPosto()
+    public function listaRetiradas()
     {
         if (!session()->has('login')) {
             return redirect()->route('login');
