@@ -74,7 +74,7 @@ php artisan serve
 
 ---
 
-# 🌳 Como lançar Branches local para a remota
+# 🌳 Como lançar Branch local para a remota
 
 ## Define o seu nome de usuário (será exibido no histórico do Git)
 ```bash
