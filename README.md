@@ -71,3 +71,42 @@ php artisan migrate:fresh --seed
 ```bash
 php artisan serve
 ```
+
+---
+
+# 🌳 Como lançar Branches local para a remota
+
+## Define o seu nome de usuário (será exibido no histórico do Git)
+```bash
+git config --global user.name "Seu Nome Aqui"
+```
+
+## Define o seu email
+```bash
+git config --global user.email "seu.email@exemplo.com"
+```
+
+## Mostra o status atual da sua branch e se há arquivos modificados
+```bash
+git status
+```
+
+## Cria uma nova branch chamada 'suaBranch' e muda para ela
+```bash
+git checkout -b feature/sua-tarefa
+```
+
+## Adiciona todos os arquivos modificados e novos ao "staging area"
+```bash
+git add .
+```
+
+## Salva as alterações com uma mensagem descritiva
+```bash
+git commit -m "feat: Implementação inicial da tela de login"
+```
+
+## Envia o branch para o repositório remoto
+```bash
+git push --set-upstream origin suaBranch
+```
