@@ -173,7 +173,7 @@ class VerificaDisponibilidadeController extends Controller
             }
         }
 
-        // Garante o retorno de uma coleção (resolve o TypeError anterior)
+        // Garante o retorno de uma coleção 
         return $disponibilidadeFinal;
     }
 
@@ -294,7 +294,6 @@ class VerificaDisponibilidadeController extends Controller
         return Estoque::select(
             'estoque.lote',
             'estoque.data_entrada',
-            // CORREÇÃO DO ERRO 1055: envolver a expressão de saldo com SUM()
             DB::raw('SUM(estoque.qtt_entrada) - IFNULL(MAX(saidas.total_saidas_pendentes), 0) as estoque_disponivel')
         )
             ->leftJoinSub($saidasPorLote, 'saidas', function ($join) {
