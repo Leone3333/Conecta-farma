@@ -20,7 +20,6 @@ class VerificaDisponibilidadeController extends Controller
         return ['indisponivel' => $this->errorM];
     }
 
-
     //verificar na tabela estoque as ocorrências dos postos com todos os medicamentos solicitados 
     public function getOcorrenciaEstque(array $medIdsSolicitados)
     {
@@ -128,7 +127,7 @@ class VerificaDisponibilidadeController extends Controller
 
                 $quantidadeSolicitada = $mapaQuantidadesSolicitadas[$idMedicamento] ?? 0;
 
-                // CHAMA O SQL OTIMIZADO (Faz a busca, subtração de saídas pendentes, e ordena FIFO)
+                // CHAMA O SQL OTIMIZADO (Faz a busca, subtração de saídas pendentes e aprovdas, e ordena FIFO)
                 // A coleção $lotesFIFO contém APENAS lotes com saldo > 0
                 $lotesFIFO = $this->getLotesDisponiveisReal($idPosto, $idMedicamento);
 
@@ -286,8 +285,7 @@ class VerificaDisponibilidadeController extends Controller
             ->select('itens_retirados.lote', DB::raw('SUM(itens_retirados.qtt_saida) as total_saidas_pendentes'))
             ->where('retiradas.id_postoFK', $idPosto)
             ->where('itens_retirados.id_medicamentoFK', $idMedicamento)
-            // CORREÇÃO DE SINTAXE: Onde 'Pendente' é uma string, use aspas.
-            ->where('retiradas.status', ['Pendente','Negada', 'Aprovada'])
+            ->whereIn('retiradas.status', ['Pendente', 'Aprovada'])
             ->groupBy('itens_retirados.lote');
 
         // 2. Consulta Principal: Subtração e Checagem (> 0)

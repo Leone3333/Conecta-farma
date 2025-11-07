@@ -84,7 +84,7 @@ class ConfirmarSoliController extends Controller
             return $dadosLote;
         });
 
-        // A partir daqui, você usa a coleção $lotesComNomes
+        // Coleção $lotesComNomes
         // dd($lotesComNomes);
 
         return view('confirmarRetirada', [
