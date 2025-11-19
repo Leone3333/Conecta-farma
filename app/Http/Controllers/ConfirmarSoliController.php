@@ -61,7 +61,7 @@ class ConfirmarSoliController extends Controller
         $retiradaLotes = collect($request->input('lotes_retirada'))->flatten(1);
 
         // Gera um código de saída único.
-        $codUnico = '#' . strtoupper(Str::random(6));
+        $codUnico = self::gerarCodigoUnico();
         // dd($codUnico);  
 
         // 2. Extrai os IDs únicos de medicamentos para buscar no banco (Otimização!)
@@ -93,5 +93,10 @@ class ConfirmarSoliController extends Controller
             'lotes' => $dataLotes,
             'codigo' => $codUnico,
         ]);
+    }
+
+    public static function gerarCodigoUnico()
+    {
+        return $cod = '#' . strtoupper(Str::random(6));
     }
 }

@@ -102,22 +102,22 @@
             justify-content: end;
             width: 100%;
             padding: 12px;
-            gap: 10px;
+            gap: 40px;
         }
 
         .btn-acao {
             border: none;
-            background: none;
+            border-radius:20px;
             cursor: pointer;
-            font-size: 1.5rem;
+            font-size: 16px;
             margin: 0 5px;
             transition: transform 0.2s, opacity 0.3s;
-            padding: 0;
+            padding: 12px;
             line-height: 1;
         }
 
         .btn-acao:hover:not(:disabled) {
-            transform: scale(1.15);
+            transform: scale(1.1);
         }
 
         .btn-acao:disabled {
@@ -125,12 +125,14 @@
             cursor: not-allowed;
         }
 
-        .btn-rejeitar .icone-acao {
-            color: var(--cor-erro);
+        .btn-rejeitar  {
+           background: #bd4b57ff;
+           color:#fff
         }
 
-        .btn-aprovar .icone-acao {
-            color: var(--cor-sucesso);
+        .btn-aprovar  {
+        background: #33ad47ff;
+           color:#fff
         }
 
         /* Estilo do Alerta de Status */
@@ -171,7 +173,7 @@
     <div class="retirada-container">
         <div class="retirada-card">
 
-            <h2 class="solicitacao-titulo">Permitir retirada {{$dataRetirada->cod_saida}}</h2>
+            <h2 class="solicitacao-titulo">Autorizar a retirada {{$dataRetirada->cod_saida}}  ?</h2>
 
 
             <table class="medicamentos-tabela">
@@ -205,7 +207,7 @@
                     <input type="hidden" name="status" value="Negada">
 
                     <button class="btn-acao btn-rejeitar" title="Rejeitar Retirada">
-                        <i class="icone-acao">❌</i>
+                       Rejeitar
                     </button>
                 </form>
 
@@ -214,8 +216,8 @@
                     <input type="hidden" name="retirada" value="{{$dataRetirada->id_retirada}}">
                     <input type="hidden" name="status" value="Aprovada">
 
-                    <button class="btn-acao btn-aprovar" title="Confirmar Retirada">
-                        <i class="icone-acao">✔️</i>
+                    <button class="btn-acao btn-aprovar" title="Aprovar Retirada">
+                        Aprovar
                     </button>
                 </form>
             </div>
