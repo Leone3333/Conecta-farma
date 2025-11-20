@@ -20,7 +20,6 @@ Route::post('/solicitar',[SolicitarRetiradaController::class, 'solicitar']);
 
 Route::get('/confirmar-retirada', function () {return view('confirmarRetirada');});
 
-
 Route::post('/postoEscolhido', [ConfirmarSoliController::class, 'selecionaPosto']);
 // Se encontra em api.php
 // Route::post('/ConfirmarRetirada', [ConfirmarSoliController::class, 'confirmar']);    

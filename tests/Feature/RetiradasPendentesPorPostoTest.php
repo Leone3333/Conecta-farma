@@ -7,7 +7,7 @@ use App\Models\Postos_saude;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 
-// CT002
+// CT002 Validar funcionalidade de consultar retiradas pendentes associadas a um posto
 class RetiradasPendentesPorPostoTest extends TestCase
 {
     // Criar todas as tabelas vazias no bd temporario

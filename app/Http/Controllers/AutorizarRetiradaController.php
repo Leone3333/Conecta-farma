@@ -39,7 +39,7 @@ class AutorizarRetiradaController extends Controller
         } else {
             $idPosto = session('login')->id_postoFK;
             $posto = Postos_saude::where('id_posto', $idPosto )->first();
-            $retiradas = $this->acessoController->retiradasAssociadas($idPosto );
+            $retiradas = Retiradas::pendentesPorPosto($idPosto );
 
             return view('codigoRetirada', ['retiradas' => $retiradas, 'posto' => $posto, 'medicamentos' => Medicamento::all()]);
            
