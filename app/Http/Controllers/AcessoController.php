@@ -31,7 +31,7 @@ class AcessoController extends Controller
                 // dump($funcionario->id_postoFK);
                 if ($funcionario->senha == $senha) {
                     $idPosto = $funcionario->id_postoFK;
-                    $retiradas = $this->retiradasAssociadas($idPosto);
+                    $retiradas = Retiradas::pendentesPorPosto($idPosto);
                     
                     if ($retiradas->isEmpty()) {
                         return back()->with('0retirada', 'Sem retiradas no posto');
@@ -45,12 +45,5 @@ class AcessoController extends Controller
         }
     }
 
-    public function retiradasAssociadas($idPosto)
-    {
-        $retiradas = Retiradas::where('id_postoFK', $idPosto)
-            ->where('status', 'Pendente')
-            ->get();
-        
-        return $retiradas;
-    }
+ 
 }

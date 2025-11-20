@@ -10,7 +10,7 @@ class GerarCodigoTest extends TestCase
 {
     protected string $codAleatorio;
 
-    //  Sempre que chama o atributo acima o método abaixo é chamado e o serviço de codigo aleatório é usado
+    //  Sempre que chama o atributo acima o método abaixo e o serviço de codigo aleatório é usado
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,6 +34,7 @@ class GerarCodigoTest extends TestCase
         // $this->assertMatchesRegularExpression('/^#[A-Z0-9]{6}$/', '#hfA326', "Os 6 caracteres após o # não são alfanuméricos em caixa alta.");
     }
 
+    // Verifica unicidade de códigos aleatórioa
     public function testUnicidadeCodigo(): void
     {
         $codigos = [];

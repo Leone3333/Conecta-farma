@@ -25,4 +25,14 @@ class Retiradas extends Model
         'status',
         'data_saida',
     ];
+
+    // Retorna uma collection com todas as retiradas com status Pendente associada a 1 idPosto válido
+       public static function pendentesPorPosto($idPosto)
+    {
+        $retiradas = Retiradas::where('id_postoFK', $idPosto)
+            ->where('status', 'Pendente')
+            ->get();
+        
+        return $retiradas;
+    }
 }
