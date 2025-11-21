@@ -22,8 +22,10 @@ class FuncionarioFactory extends Factory
         return [
             // Defina valores padrão válidos e aleatórios para campos obrigatórios
             'id_postoFK' => \App\Models\Postos_saude::factory(), 
-            'matricula' => $this->faker->unique()->randomNumber(6),
-            'senha' => $this->faker->randomNumber(6)
+            'matricula' => $this->faker->unique()->numerify('######'),
+            
+            // Usa numerify() para garantir que a senha seja uma string de 6 dígitos
+            'senha' => $this->faker->numerify('######')
         ];
     }
 }

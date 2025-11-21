@@ -9,5 +9,11 @@ class Funcionario extends Model
 {
     use HasFactory;
 
+    // Define a chave primária customizada.
+    protected $primaryKey = 'id_funcionario';
+    // ----------------------------
+
+    protected $table = 'funcionarios'; // Se sua tabela se chama 'funcionarios'
+
     public $timestamps = false;
 }

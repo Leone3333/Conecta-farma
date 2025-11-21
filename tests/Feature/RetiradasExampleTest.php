@@ -6,7 +6,7 @@ use Tests\TestCase;
 use App\Models\Retiradas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class RetiradasTest extends TestCase
+class RetiradasExampleTest extends TestCase
 {
     use RefreshDatabase;
     /**
